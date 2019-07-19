@@ -19,6 +19,7 @@ __pycache__/
 .Rproj.user/
 
 
+## exclude library except for netSTI folder
 !lib/
 lib/*
 !lib/python3.7/
