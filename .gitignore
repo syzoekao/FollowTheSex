@@ -1,0 +1,22 @@
+SMDM\ 2018/
+share/
+results/
+research\ day\ slide/
+*.json
+*.Rproj
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+multi\ R\ file.R
+msi\ files/
+include/
+etc/
+*.rdb
+bin/
+__pycache__/
+.Python
+.Rhistory
+.Rproj.user/
+
+lib/**
+!lib/python3.7/site-packages/netSTI
