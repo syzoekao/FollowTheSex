@@ -23,6 +23,6 @@ __pycache__/
 lib/**
 !lib/python3.7/
 lib/python3.7/**
-!lib/python3.7/site-package/
-lib/python3.7/site-package/**
-!lib/python3.7/site-package/netSTI/**
+!lib/python3.7/site-packages/
+lib/python3.7/site-packages/**
+!lib/python3.7/site-packages/netSTI/**
