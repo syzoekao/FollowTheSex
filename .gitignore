@@ -26,4 +26,5 @@ lib/*
 lib/python3.7/*
 !lib/python3.7/site-packages/
 lib/python3.7/site-packages/*
-!lib/python3.7/site-packages/netSTI/*
+!lib/python3.7/site-packages/netSTI/
+!lib/python3.7/site-packages/netSTI/tests/
