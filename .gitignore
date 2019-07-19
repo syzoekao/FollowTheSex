@@ -19,7 +19,6 @@ __pycache__/
 .Rproj.user/
 
 
+!lib/
 lib/**
-!lib/python3.7/
-!lib/python3.7/site-packages/
 !lib/python3.7/site-packages/netSTI/**
