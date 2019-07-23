@@ -1,6 +1,6 @@
 library(poweRlaw)
 
-x = c(1:250) # maximum number of partners is 250
+x = c(1:500) # maximum number of partners is 250
 
 estAlpha = function(x, alpha, m) {
   xx = dpldis(x, 1, alpha)
@@ -10,16 +10,16 @@ estAlpha = function(x, alpha, m) {
   return(out)
 }
 
-alpha_seq = seq(1.00001, 2, 0.01)
+alpha_seq = seq(0.5, 5, 0.01)
 
-out = do.call(rbind, lapply(alpha_seq, estAlpha, x = x, m = 4*10))
+out = do.call(rbind, lapply(alpha_seq, estAlpha, x = x, m = 4*20))
 out = data.frame(out)
 min_alpha = out$alpha[out$difference == min(out$difference)]
 
-PowerLawDistribution = dpldis(x, 1, 1.02)
+PowerLawDistribution = dpldis(x, 1, 0.97)
 PowerLawDist = (PowerLawDistribution)/sum(PowerLawDistribution)
 
-fileConn<-file("PowerLawDist(40degree).txt")
+fileConn<-file("PowerLawDist(80degree).txt")
 writeLines(paste0(PowerLawDist, collapse=", "), fileConn)
 close(fileConn)
 

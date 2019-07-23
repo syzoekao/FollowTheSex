@@ -27,7 +27,7 @@ def sim_task(run):
     graph_function = community_graph_generator
     graph_function = powerLaw_graph_generator
     '''
-    return net.SIR_net_generator(run, Npop = 5000, meanActs = 27, Ndegree = 4, years = 10, days = 14, 
+    return net.SIR_net_generator(run, Npop = 5000, meanActs = 27, Ndegree = 4, years = 20, days = 14, 
     strategy = "null", graph = "community", adjust_sex_acts = False)
 
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     print(cwd)
 
     start_time = time.time()
-    ret = ResultSet([sim_task.delay(i) for i in range(300)])
+    ret = ResultSet([sim_task.delay(i) for i in range(100)])
     print(len(ret.get()))
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)

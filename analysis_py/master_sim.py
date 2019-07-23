@@ -16,17 +16,19 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-results_key = ['powerLaw_graph', 'random_graph', 'community_graph']
-
 x = "community"
 with open('results/trend/trend_' + x + '.txt') as json_file:  
-    temp_ls = json.load(json_file)
+    temp = json.load(json_file)
+
+temp_ls = [None] * len(temp)
+for i in range(len(temp)): 
+    temp_ls[i] = temp[i]["I"]
 
 ret = np.array(temp_ls)
 print(np.mean(ret[:, 200:], axis = 0))
 fig = plt.figure(figsize=(6,4))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title("0.033")
+plt.title("0.11")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
 plt.tight_layout()
