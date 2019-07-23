@@ -1,5 +1,4 @@
 import time
-import net
 import numpy as np
 import os
 import json
@@ -7,6 +6,7 @@ import sys
 from celery import Celery
 from celery.result import ResultSet
 import celery.signals
+import netSTI.net as net
 
  
 app = Celery('netTask',
@@ -27,14 +27,8 @@ def sim_task(run):
     graph_function = community_graph_generator
     graph_function = powerLaw_graph_generator
     '''
-    graph_function = net.random_graph_generator
-    return net.SIR_net_generator(run, graph_function, 
-        Npop = 1000, Ndegree = 4*10, time_horizon = 12*10, 
-        pInf = 0.17, pCondom = (0.32+.21)/2, redCondom = 0.6, 
-        durI = 6, rScr = 0.3/12, pContact_tr = 0.7, pContact_ept = 0.7, 
-        pContact_PN = 0.49, p_treat_tr = 0.79, p_treat_ept = 0.79, p_treat_PN = 0.71, 
-        init_prev = 0.05, n_cluster = 5, strategy = "null", max_contact = 30, 
-        max_ept = 500, alpha = 1, check_steady_state = True)
+    return net.SIR_net_generator(run, Npop = 5000, meanActs = 27, Ndegree = 4, years = 10, days = 14, 
+    strategy = "null", graph = "community", adjust_sex_acts = False)
 
 
 if __name__ == "__main__":
@@ -43,12 +37,12 @@ if __name__ == "__main__":
     print(cwd)
 
     start_time = time.time()
-    ret = ResultSet([sim_task.delay(i) for i in range(10)])
+    ret = ResultSet([sim_task.delay(i) for i in range(300)])
     print(len(ret.get()))
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
 
-    with open('results/trend_random.txt', 'w') as fout:
+    with open('results/trend/trend_community.txt', 'w') as fout:
         json.dump(ret.get(), fout)
 
 

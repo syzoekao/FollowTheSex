@@ -18,23 +18,19 @@ print(cwd)
 
 results_key = ['powerLaw_graph', 'random_graph', 'community_graph']
 
-for x in results_key: 
-    # x = "community_graph"
-    temp_ls = []
-    for file_n in range(1, 11): 
-        with open('results/trend/'+ x + '_trends_' + str(file_n)+'.txt') as json_file:  
-            temp_ls += json.load(json_file)
+x = "community"
+with open('results/trend/trend_' + x + '.txt') as json_file:  
+    temp_ls = json.load(json_file)
 
-    ret = np.array(temp_ls)
-    print(np.mean(ret[:, ret.shape[1]-1]))
-    fig = plt.figure(figsize=(6,4))
-    xax = np.array([x for x in range(ret.shape[1])])
-    plt.plot(xax, ret[0], color = 'limegreen', linewidth=2)
-    plt.title(x + " (beta = 0.135 init = 0.1)")
-    for i in range(1, ret.shape[0]): 
-        plt.plot(xax, ret[i], color = 'limegreen', linewidth=2)
-    plt.tight_layout()
-    plt.savefig('results/trend/'+ x+ '20 years (prev0.135 init0.1).eps', format='eps', dpi=1000)
+ret = np.array(temp_ls)
+print(np.mean(ret[:, 200:], axis = 0))
+fig = plt.figure(figsize=(6,4))
+plt.plot(ret[0], color = 'limegreen', linewidth=2)
+plt.title("0.033")
+for i in range(1, ret.shape[0]): 
+    plt.plot(ret[i], color = 'limegreen', linewidth=2)
+plt.tight_layout()
+plt.savefig('results/trend/trend' + x + '.eps', format='eps', dpi=1000)
 
 
 
