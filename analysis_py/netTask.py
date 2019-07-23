@@ -29,11 +29,11 @@ def sim_task(run):
     '''
     graph_function = net.random_graph_generator
     return net.SIR_net_generator(run, graph_function, 
-        Npop = 5000, Ndegree = 4*10, time_horizon = 12*10, 
+        Npop = 1000, Ndegree = 4*10, time_horizon = 26*10, 
         pInf = 0.135, pCondom = 0.44, redCondom = 0.6, 
-        durI = 6, rScr = 0.3/12, pContact_tr = 0.7, pContact_ept = 0.7, 
+        durI = 13, rScr = 0.3/26, pContact_tr = 0.7, pContact_ept = 0.7, 
         pContact_PN = 0.49, p_treat_tr = 0.79, p_treat_ept = 0.79, p_treat_PN = 0.71, 
-        init_prev = 0.1, n_cluster = 5, strategy = "null", max_contact = 30, 
+        init_prev = 0.1, n_cluster = 5, strategy = "null", max_contact = 15, 
         max_ept = 500, alpha = 1, check_steady_state = True)
 
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     print(cwd)
 
     start_time = time.time()
-    ret = ResultSet([sim_task.delay(i) for i in range(10)])
+    ret = ResultSet([sim_task.delay(i) for i in range(100)])
     print(len(ret.get()))
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
