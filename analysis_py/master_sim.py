@@ -1,4 +1,49 @@
 '''
+Check degree distribution of power law
+'''
+import numpy as np
+import netSTI.net as net
+import netSTI.mydata as data
+import pandas as pd
+import json
+import matplotlib as mpl
+import copy
+print(mpl.rcParams['backend'])
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
+plt.get_backend()
+import os
+os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
+cwd = os.getcwd()
+print(cwd)
+
+Npop = 5000
+ID = np.arange(Npop)
+dur = data.SexBehavior().dur
+dur_dist = data.SexBehavior().dur_dist
+years = 20
+Ndegree = 4 * years
+days = 14
+unit_per_year = int(365 / days)
+time_horizon = unit_per_year * years
+
+fig = plt.figure(figsize=(6,4))
+for run in range(10): 
+    print(run)
+    rel_hist = net.power_law_graph_generator(ID, Npop, dur, dur_dist, time_horizon, n_yrs = years)
+
+    tmp_rel = rel_hist[(rel_hist[:, 3] >= (10 * unit_per_year))]
+    tmp_names, tmp_degree = np.unique(tmp_rel[:, :2], return_counts = True)
+    degree, counts = np.unique(tmp_degree, return_counts = True)
+    degree_dist = counts / np.sum(counts)
+    plt.scatter(np.log(degree), np.log(degree_dist), color = 'limegreen')
+
+plt.tight_layout()
+plt.savefig('results/power law degree distribution.eps', format='eps', dpi=1000)
+
+
+
+'''
 Trends
 '''
 import seaborn as sbn 
