@@ -34,7 +34,7 @@ for x in results_key:
     for i in range(1, ret.shape[0]): 
         plt.plot(xax, ret[i], color = 'limegreen', linewidth=2)
     plt.tight_layout()
-    plt.savefig('results/trend/'+ x+ '20 years (prev0.135 init0.1).eps', format='eps', dpi=1000)
+    plt.savefig('results/trend/'+ x + ' old plot.eps', format='eps', dpi=1000)
 
 
 
