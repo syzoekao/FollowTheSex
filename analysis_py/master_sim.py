@@ -62,7 +62,7 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-x = "power_law"
+x = "community"
 with open('results/trend/trend_' + x + '.txt') as json_file:  
     temp = json.load(json_file)
 
@@ -74,7 +74,7 @@ ret = np.array(temp_ls)
 print(np.mean(ret, axis = 0))
 fig = plt.figure(figsize=(6,4))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title("pInf = 0.135 & meanActs = 100")
+plt.title(x + ": pInf = 0.135 & meanActs = 30")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
 plt.tight_layout()
@@ -88,7 +88,7 @@ ret = np.array(temp_ls)
 print(np.mean(ret, axis = 0))
 fig = plt.figure(figsize=(6,4))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title("pInf = 0.135 & meanActs = 100")
+plt.title(x + ": pInf = 0.135 & meanActs = 30")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
 plt.tight_layout()

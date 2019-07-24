@@ -18,20 +18,20 @@ print(cwd)
 
 nchain = 1
 
-pars = [38]
+pars = [29]
 pars_name = ["meanActs"]
 pars_lb = [10]
 pars_ub = [100]
 
 scales = {"meanActs": 0.5}
 
-target_cum_dx = np.repeat(0.14, 10)
+target_cum_dx = np.repeat(0.14, 9)
 sd_cum_dx = np.sqrt(target_cum_dx * 0.1)
 
 outcomes = mcmc.AdpativeMCMC(iters = 6000, burn_in = 1000, adapt_par = [100, 100], \
 	pars = pars, pars_name = pars_name, pars_lb = pars_lb, pars_ub = pars_ub, scales = scales, \
 	target = target_cum_dx, target_sd = sd_cum_dx, verbose = 1, function = net.SIR_net_generator, \
-	run = 1, Npop = 5000, years = 30, days = 14, \
+	run = 1, Npop = 5000, years = 20, days = 14, \
 	strategy = "null", graph = "random", adjust_sex_acts = False, calibration = True)
 
 with open('cal_data/mcmc_results_' + str(nchain) + '.txt', 'w') as fout:
