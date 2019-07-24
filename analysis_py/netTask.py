@@ -27,8 +27,8 @@ def sim_task(run):
     graph_function = community_graph_generator
     graph_function = powerLaw_graph_generator
     '''
-    return net.SIR_net_generator(run, Npop = 5000, meanActs = 27, Ndegree = 4, years = 20, days = 14, 
-    strategy = "null", graph = "community", adjust_sex_acts = False)
+    return net.SIR_net_generator(meanActs = 40, run = run, Npop = 5000, years = 20, days = 14, 
+    strategy = "null", graph = "power_law", adjust_sex_acts = False, calibration = False)
 
 
 if __name__ == "__main__":
@@ -37,12 +37,12 @@ if __name__ == "__main__":
     print(cwd)
 
     start_time = time.time()
-    ret = ResultSet([sim_task.delay(i) for i in range(100)])
+    ret = ResultSet([sim_task.delay(i) for i in range(50)])
     print(len(ret.get()))
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
 
-    with open('results/trend/trend_community.txt', 'w') as fout:
+    with open('results/trend/trend_power_law.txt', 'w') as fout:
         json.dump(ret.get(), fout)
 
 
