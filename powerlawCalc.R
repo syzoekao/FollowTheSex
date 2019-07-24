@@ -10,16 +10,16 @@ estAlpha = function(x, alpha, m) {
   return(out)
 }
 
-alpha_seq = seq(0.5, 5, 0.01)
+alpha_seq = seq(0.1, 5, 0.01)
 
-out = do.call(rbind, lapply(alpha_seq, estAlpha, x = x, m = 4*20))
+out = do.call(rbind, lapply(alpha_seq, estAlpha, x = x, m = 4*30))
 out = data.frame(out)
 min_alpha = out$alpha[out$difference == min(out$difference)]
 
-PowerLawDistribution = dpldis(x, 1, 0.97)
+PowerLawDistribution = dpldis(x, 1, 0.77)
 PowerLawDist = (PowerLawDistribution)/sum(PowerLawDistribution)
 
-fileConn<-file("PowerLawDist(80degree).txt")
+fileConn<-file("PowerLawDist(120degree).txt")
 writeLines(paste0(PowerLawDist, collapse=", "), fileConn)
 close(fileConn)
 
