@@ -7,6 +7,7 @@ import netSTI.mydata as data
 import pandas as pd
 import json
 import matplotlib as mpl
+from sklearn.linear_model import LinearRegression
 import copy
 print(mpl.rcParams['backend'])
 mpl.use('TkAgg')
@@ -32,7 +33,7 @@ for run in range(10):
     print(run)
     rel_hist = net.power_law_graph_generator(ID, Npop, dur, dur_dist, time_horizon, n_yrs = years)
 
-    tmp_rel = rel_hist[(rel_hist[:, 3] >= (10 * unit_per_year))]
+    tmp_rel = rel_hist[(rel_hist[:, 3] >= (15 * unit_per_year))]
     tmp_names, tmp_degree = np.unique(tmp_rel[:, :2], return_counts = True)
     degree, counts = np.unique(tmp_degree, return_counts = True)
     degree_dist = counts / np.sum(counts)
@@ -61,24 +62,37 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-x = "community"
+x = "power_law"
 with open('results/trend/trend_' + x + '.txt') as json_file:  
     temp = json.load(json_file)
 
 temp_ls = [None] * len(temp)
 for i in range(len(temp)): 
-    temp_ls[i] = temp[i]["I"]
+    temp_ls[i] = temp[i]["p_cumulative_dx"]
 
 ret = np.array(temp_ls)
-print(np.mean(ret[:, 200:], axis = 0))
+print(np.mean(ret, axis = 0))
 fig = plt.figure(figsize=(6,4))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title("0.11")
+plt.title("pInf = 0.135 & meanActs = 100")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
 plt.tight_layout()
-plt.savefig('results/trend/trend' + x + '.eps', format='eps', dpi=1000)
+plt.savefig('results/trend/cumulative dx ' + x + ' (unadjusted).eps', format='eps', dpi=1000)
 
+
+temp_ls = [None] * len(temp)
+for i in range(len(temp)): 
+    temp_ls[i] = temp[i]["I"]
+ret = np.array(temp_ls)
+print(np.mean(ret, axis = 0))
+fig = plt.figure(figsize=(6,4))
+plt.plot(ret[0], color = 'limegreen', linewidth=2)
+plt.title("pInf = 0.135 & meanActs = 100")
+for i in range(1, ret.shape[0]): 
+    plt.plot(ret[i], color = 'limegreen', linewidth=2)
+plt.tight_layout()
+plt.savefig('results/trend/prevalence ' + x + ' (unadjusted).eps', format='eps', dpi=1000)
 
 
 
