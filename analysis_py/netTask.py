@@ -27,7 +27,7 @@ def sim_task(run):
     graph_function = community_graph_generator
     graph_function = powerLaw_graph_generator
     '''
-    return net.SIR_net_generator(meanActs = 30, run = run, Npop = 5000, years = 20, days = 14, 
+    return net.SIR_net_generator(meanActs = 29, run = run, Npop = 5000, years = 20, days = 14, 
     strategy = "PN", graph = "community", adjust_sex_acts = False, calibration = False)
 
 

@@ -9,6 +9,7 @@ import json
 import matplotlib as mpl
 from sklearn.linear_model import LinearRegression
 import copy
+from pylab import *
 print(mpl.rcParams['backend'])
 mpl.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -28,19 +29,105 @@ days = 14
 unit_per_year = int(365 / days)
 time_horizon = unit_per_year * years
 
+nsamp = 100
+fit_vec = np.zeros(nsamp)
+avg_deg = np.zeros(nsamp)
+
 fig = plt.figure(figsize=(6,4))
-for run in range(10): 
+ax = plt.gca()
+for run in range(nsamp): 
     print(run)
     rel_hist = net.power_law_graph_generator(ID, Npop, dur, dur_dist, time_horizon, n_yrs = years)
 
-    tmp_rel = rel_hist[(rel_hist[:, 3] >= (15 * unit_per_year))]
+    tmp_rel = rel_hist[(rel_hist[:, 3] >= (10 * unit_per_year))]
     tmp_names, tmp_degree = np.unique(tmp_rel[:, :2], return_counts = True)
     degree, counts = np.unique(tmp_degree, return_counts = True)
     degree_dist = counts / np.sum(counts)
-    plt.scatter(np.log(degree), np.log(degree_dist), color = 'limegreen')
+    fit = np.polyfit(np.log(degree), np.log(degree_dist), 1)
+    fit_vec[run] = fit[1]
+    fit_fn = np.poly1d(fit)
+    avg_deg[run] = np.mean(tmp_degree)
+    ax.scatter(np.log(degree), np.log(degree_dist), edgecolor = 'limegreen', facecolors='none')
+    ax.plot(np.log(degree), fit_fn(np.log(degree)), 'royalblue')
 
-plt.tight_layout()
+x_ticks = np.array([0.1, 1, 2, 3, 4, 5])
+y_ticks = np.array([-8, -6, -4, -2, -0.1])
+ax.set_xticks(x_ticks)
+ax.set_xticklabels(np.round(np.exp(x_ticks)))
+ax.set_yticks(y_ticks)
+ax.set_yticklabels(np.round(np.exp(y_ticks), 3))
+ax.text(0.1, -7, 'mean of the slope is\n' + str(np.round(np.mean(fit_vec), 2)) + \
+    '\naverage mean degree\n(last 10 years):\n' + str(np.round(np.mean(avg_deg), 2)), fontsize=12)
+plt.xlabel('degree')
+plt.ylabel('proportion')
+plt.title('100 network samples')
 plt.savefig('results/power law degree distribution.eps', format='eps', dpi=1000)
+
+
+from scipy.stats import poisson
+
+Npop = 5000
+ID = np.arange(Npop)
+dur = data.SexBehavior().dur
+dur_dist = data.SexBehavior().dur_dist
+years = 20
+Ndegree = 4 * years
+days = 14
+unit_per_year = int(365 / days)
+time_horizon = unit_per_year * years
+n_cluster = 5
+ID_cluster = (np.floor(ID / (Npop/n_cluster)) + 1).astype(int)
+
+nsamp = 100
+avg_deg = np.zeros(nsamp)
+
+fig = plt.figure(figsize=(6,4))
+ax = plt.gca()
+for run in range(nsamp):
+    print(run)
+    rel_hist = net.random_graph_generator(ID, Npop, Ndegree, dur, dur_dist, time_horizon)
+
+    tmp_rel = rel_hist[(rel_hist[:, 3] >= (10 * unit_per_year))]
+    tmp_names, tmp_degree = np.unique(tmp_rel[:, :2], return_counts = True)
+    ax.hist(tmp_degree, density=True, color = 'limegreen')
+    x_pois = np.arange(np.min(tmp_degree), np.max(tmp_degree))
+    pois = poisson.pmf(x_pois, np.mean(tmp_degree))
+    avg_deg[run] = np.mean(tmp_degree)
+    ax.plot(x_pois, pois, 'royalblue')
+
+ax.text(5, 0.05, 'average mean degree\n(last 10 years):\n' + \
+    str(np.round(np.mean(avg_deg), 2)), fontsize=12)
+plt.xlabel('degree')
+plt.ylabel('proportion')
+plt.title('100 network samples')
+plt.savefig('results/random degree distribution.eps', format='eps', dpi=1000)
+
+
+'''
+Average degree per time step
+'''
+
+all_deg = [None] * 3
+net_name = ["random", "community", "power_law"]
+for x in range(len(net_name)): 
+    with open('results/trend/trend_' + net_name[x] + '.txt') as json_file:  
+        temp = json.load(json_file)
+
+    temp_ls = [None] * len(temp)
+    for i in range(len(temp)): 
+        temp_ls[i] = temp[i]["avg_degree"]
+
+    all_deg[x] = np.array(temp_ls)
+
+cols = ['royalblue', 'limegreen', 'tomato']
+fig = plt.figure(figsize=(6,4))
+for run in range(len(all_deg)): 
+    plt.plot(np.mean(all_deg[run], axis = 0), cols[run], label = net_name[run])
+plt.xlabel('time step')
+plt.ylabel('degree')
+plt.legend(loc= 'lower right')
+plt.title('Average degree at each time step\n across 50 simulations')
+plt.savefig('results/average degree comparison.eps', format='eps', dpi=1000)
 
 
 
@@ -74,7 +161,7 @@ ret = np.array(temp_ls)
 print(np.mean(ret, axis = 0))
 fig = plt.figure(figsize=(6,4))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title(x + ": pInf = 0.135 & meanActs = 30")
+plt.title(x + ": pInf = 0.135 & meanActs = 29")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
 plt.tight_layout()
@@ -88,9 +175,12 @@ ret = np.array(temp_ls)
 print(np.mean(ret, axis = 0))
 fig = plt.figure(figsize=(6,4))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title(x + ": pInf = 0.135 & meanActs = 30")
+plt.title(x + ": pInf = 0.135 & meanActs = 29")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
+    plt.ylim([0, 0.4])
+plt.text(200, 0.05, 'mean prevalence\n(last 10 years):\n' + \
+    str(np.round(np.mean(np.mean(ret, axis = 0)[260:]), 2)), fontsize=12)
 plt.tight_layout()
 plt.savefig('results/trend/prevalence ' + x + ' (unadjusted).eps', format='eps', dpi=1000)
 

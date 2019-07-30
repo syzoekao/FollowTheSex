@@ -23,12 +23,12 @@ pars_name = ["meanActs"]
 pars_lb = [10]
 pars_ub = [100]
 
-scales = {"meanActs": 0.5}
+scales = {"meanActs": 0.1}
 
 target_cum_dx = np.repeat(0.14, 9)
-sd_cum_dx = np.sqrt(target_cum_dx * 0.1)
+sd_cum_dx = target_cum_dx * 0.1
 
-outcomes = mcmc.AdpativeMCMC(iters = 6000, burn_in = 1000, adapt_par = [100, 100], \
+outcomes = mcmc.AdpativeMCMC(iters = 1000, burn_in = 100, adapt_par = [100, 100], \
 	pars = pars, pars_name = pars_name, pars_lb = pars_lb, pars_ub = pars_ub, scales = scales, \
 	target = target_cum_dx, target_sd = sd_cum_dx, verbose = 1, function = net.SIR_net_generator, \
 	run = 1, Npop = 5000, years = 20, days = 14, \
