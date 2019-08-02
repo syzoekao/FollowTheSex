@@ -134,6 +134,7 @@ plt.savefig('results/average degree comparison.eps', format='eps', dpi=1000)
 '''
 Trends
 '''
+
 import seaborn as sbn 
 import numpy as np
 import pandas as pd
@@ -149,40 +150,43 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-x = "community"
-with open('results/trend/trend_' + x + '.txt') as json_file:  
+x = "random"
+with open('results/trend/trend_' + x + '_unadjusted (null).txt') as json_file:  
     temp = json.load(json_file)
 
 temp_ls = [None] * len(temp)
 for i in range(len(temp)): 
-    temp_ls[i] = temp[i]["p_cumulative_dx"]
-
+    temp_ls[i] = temp[i]
 ret = np.array(temp_ls)
 print(np.mean(ret, axis = 0))
-fig = plt.figure(figsize=(6,4))
+fig = plt.figure(figsize=(7, 5))
 plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title(x + ": pInf = 0.135 & meanActs = 29")
+plt.title(x + ": pInf = 0.135 & meanActs = 14.3")
 for i in range(1, ret.shape[0]): 
     plt.plot(ret[i], color = 'limegreen', linewidth=2)
-plt.tight_layout()
-plt.savefig('results/trend/cumulative dx ' + x + ' (unadjusted).eps', format='eps', dpi=1000)
+    plt.ylim([0, 0.2])
+plt.text(50, 0.17, 'mean prevalence (null): ' + \
+    str(np.round(np.mean(np.mean(ret, axis = 0)[-260:]), 2)), fontsize=12)
 
+with open('results/trend/trend_' + x + '_unadjusted (PN).txt') as json_file:  
+    temp = json.load(json_file)
 
 temp_ls = [None] * len(temp)
 for i in range(len(temp)): 
-    temp_ls[i] = temp[i]["I"]
+    temp_ls[i] = temp[i]
 ret = np.array(temp_ls)
 print(np.mean(ret, axis = 0))
-fig = plt.figure(figsize=(6,4))
-plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title(x + ": pInf = 0.135 & meanActs = 29")
+plt.plot(ret[0], color = 'royalblue', linewidth=2, alpha = 0.5)
 for i in range(1, ret.shape[0]): 
-    plt.plot(ret[i], color = 'limegreen', linewidth=2)
-    plt.ylim([0, 0.4])
-plt.text(200, 0.05, 'mean prevalence\n(last 10 years):\n' + \
-    str(np.round(np.mean(np.mean(ret, axis = 0)[260:]), 2)), fontsize=12)
+    plt.plot(ret[i], color = 'royalblue', linewidth=2, alpha = 0.5)
+    plt.ylim([0, 0.2])
+
+plt.xlabel("time step")
+plt.ylabel("prevalence")
+plt.text(50, 0.15, 'mean prevalence (PN): ' + \
+    str(np.round(np.mean(np.mean(ret, axis = 0)[-260:]), 2)), fontsize=12)
 plt.tight_layout()
-plt.savefig('results/trend/prevalence ' + x + ' (unadjusted).eps', format='eps', dpi=1000)
+plt.savefig('results/trend/prevalence ' + x + ' (adjusted)2.png')
 
 
 
