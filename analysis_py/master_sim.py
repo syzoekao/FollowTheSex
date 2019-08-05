@@ -140,6 +140,8 @@ import numpy as np
 import pandas as pd
 import json
 import matplotlib as mpl
+from matplotlib import collections  as mc
+from matplotlib.patches import Rectangle
 import copy
 print(mpl.rcParams['backend'])
 mpl.use('TkAgg')
@@ -150,44 +152,58 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-x = "random"
-with open('results/trend/trend_' + x + '_unadjusted (null).txt') as json_file:  
+x = "power_law"
+with open('results/trend/trend_' + x + '_adjusted (null).txt') as json_file:  
     temp = json.load(json_file)
 
 temp_ls = [None] * len(temp)
 for i in range(len(temp)): 
     temp_ls[i] = temp[i]
 ret = np.array(temp_ls)
-print(np.mean(ret, axis = 0))
+mean_ret = np.mean(ret, axis = 0)
+ub = np.percentile(ret, 95, axis = 0)
+lb = np.percentile(ret, 5, axis = 0)
+x_data = np.arange(mean_ret.shape[0])
+
 fig = plt.figure(figsize=(7, 5))
-plt.plot(ret[0], color = 'limegreen', linewidth=2)
-plt.title(x + ": pInf = 0.135 & meanActs = 14.3")
-for i in range(1, ret.shape[0]): 
-    plt.plot(ret[i], color = 'limegreen', linewidth=2)
-    plt.ylim([0, 0.2])
-plt.text(50, 0.17, 'mean prevalence (null): ' + \
-    str(np.round(np.mean(np.mean(ret, axis = 0)[-260:]), 2)), fontsize=12)
+plt.plot(x_data, ub, color = 'gray', linewidth = 0, alpha = 0.7)
+plt.plot(x_data, lb, color = 'gray', linewidth = 0, alpha = 0.7)
+plt.plot(x_data, mean_ret, color = 'k', linewidth = 2)
+plt.fill_between(x_data, lb, ub, color = 'gray', alpha = 0.7)
+plt.ylim([0, 0.5])
+plt.title(x[0].capitalize() + x[1:])
 
-with open('results/trend/trend_' + x + '_unadjusted (PN).txt') as json_file:  
+with open('results/trend/trend_' + x + '_adjusted (tracing).txt') as json_file:  
     temp = json.load(json_file)
 
 temp_ls = [None] * len(temp)
 for i in range(len(temp)): 
     temp_ls[i] = temp[i]
-ret = np.array(temp_ls)
-print(np.mean(ret, axis = 0))
-plt.plot(ret[0], color = 'royalblue', linewidth=2, alpha = 0.5)
-for i in range(1, ret.shape[0]): 
-    plt.plot(ret[i], color = 'royalblue', linewidth=2, alpha = 0.5)
-    plt.ylim([0, 0.2])
+ret2 = np.array(temp_ls)
+mean_ret2 = np.mean(ret2, axis = 0)
+ub2 = np.percentile(ret2, 95, axis = 0)
+lb2 = np.percentile(ret2, 5, axis = 0)
+x_data2 = np.arange(mean_ret2.shape[0])
+
+plt.plot(x_data2, ub2, color = 'royalblue', linewidth = 0, alpha = 0.7)
+plt.plot(x_data2, lb2, color = 'royalblue', linewidth = 0, alpha = 0.7)
+plt.plot(x_data2, mean_ret2, color = 'mediumblue', linewidth = 2)
+plt.fill_between(x_data2, lb2, ub2, color = 'royalblue', alpha = 0.7)
+plt.ylim([0, 0.5])
+
+color_ls = ["gray", "royalblue"]
+handles = [Rectangle((0, 0), 1, 1, color = c, ec = c) for c in color_ls] 
+labels = ["Screening alone", "PN"] 
+plt.legend(handles, labels, loc = 2, frameon = False, fontsize = 'small')
 
 plt.xlabel("time step")
 plt.ylabel("prevalence")
-plt.text(50, 0.15, 'mean prevalence (PN): ' + \
-    str(np.round(np.mean(np.mean(ret, axis = 0)[-260:]), 2)), fontsize=12)
+plt.text(10, 0.3, 'mean prevalence\n' + \
+    'screening: ' + str(np.round(np.mean(np.mean(ret, axis = 0)[-260:]), 2)) + 
+    '\nPN: ' + str(np.round(np.mean(np.mean(ret2, axis = 0)[-260:]), 2)), fontsize = 'x-small')
 plt.tight_layout()
-plt.savefig('results/trend/prevalence ' + x + ' (adjusted)2.png')
-
+plt.savefig('results/trend/trend ' + x + '.png', dpi = 400)
+plt.clf()
 
 
 '''

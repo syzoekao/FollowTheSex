@@ -7,8 +7,14 @@ from celery import Celery
 from celery.result import ResultSet
 import celery.signals
 import netSTI.net as net
+import netSTI.posterior as post
 
- 
+import os
+os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
+cwd = os.getcwd()
+print(cwd)
+
+
 app = Celery('netTask',
              broker='redis://localhost:6379/0',
              backend='redis://')
@@ -21,15 +27,12 @@ def seed_rng(**_):
     np.random.seed()
 
 @app.task
-def sim_task(run): 
-    '''
-    graph_function = random_graph_generator
-    graph_function = community_graph_generator
-    graph_function = powerLaw_graph_generator
-    '''
-    return net.SIR_net_generator(meanActs = 14.3, run = run, Npop = 5000, years = 50, days = 14, 
-    strategy = "null", graph = "random", independent = True, calibration = True, 
-    analysis_window = 20)
+def sim_task(run, par_vec, strategy, indep, graph): 
+    return net.SIR_net_generator(meanActs = par_vec[run], run = run, 
+        Npop = 5000, years = 20, days = 14, strategy = strategy, graph = graph, 
+        pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
+        p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
+        independent = indep, calibration = True, analysis_window = 12)
 
 
 if __name__ == "__main__":
@@ -37,64 +40,19 @@ if __name__ == "__main__":
     cwd = os.getcwd()
     print(cwd)
 
+    graph = "power_law"
+    strategy = "tracing"
+    indep = False
+
+    n_samp = 100
+    par_vec = post.SamplePosterior(g = graph, target_prev = 0.20, indep = indep).sample_from_posterior(n_samp)
+    par_vec = par_vec.tolist()
+
     start_time = time.time()
-    ret = ResultSet([sim_task.delay(i) for i in range(50)])
+    ret = ResultSet([sim_task.delay(i, par_vec, strategy, indep, graph) for i in range(n_samp)])
     print(len(ret.get()))
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
 
-    with open('results/trend/trend_random_unadjusted (null).txt', 'w') as fout:
+    with open('results/trend/trend_' + graph + '_adjusted (' + strategy + ').txt', 'w') as fout:
         json.dump(ret.get(), fout)
-
-
-
-'''
-if __name__ == "__main__":
-    start_time = time.time()
-    
-    n_runs = [x for x in range(1, 50, 1)]
-    # Using `delay` runs the task async
-    rs = ResultSet([simulation_task.delay(run) for run in n_runs])
-     
-    # Wait for the tasks to finish
-    rs.get()
- 
-    end_time = time.time()
- 
-    print("CelerySquirrel:", end_time - start_time)
-    # CelerySquirrel: 2.4979639053344727
-
-    rs.get()
-    print(rs.get()[0])
-
-    results = rs.get()
-
-
-if __name__ == "__main__":
-    os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
-    # os.chdir("/panfs/roc/groups/0/ennse/kaoxx085/diss")
-    cwd = os.getcwd()
-    print(cwd)
-
-    sys.stdout = open('Console_out', 'w')
-
-    n_runs = [x for x in range(1, 11, 1)]
-
-    start_time = time.time()
-    result = ResultSet([simulation_task.delay(run) for run in n_runs])
-    end_time = time.time()
-     
-    print("CelerySquirrel:", end_time - start_time)
-
-    result.get()
-    result_l = result.get()
-
-    import json
-    with open('results/outputfile', 'w') as fout:
-        json.dump(results_l, fout)
-
-    sys.stdout.close()
-'''
-
-
-

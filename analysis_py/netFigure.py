@@ -166,6 +166,7 @@ S[infID] = 0
 n_sim = 500
 cor_vec = np.zeros(n_sim)
 mean_deg = np.zeros(n_sim)
+mean_iso = np.zeros(n_sim)
 for z in range(n_sim): 
 	print(z)
 	g = net.random_graph_generator(ID, Npop, Ndegree, time_horizon, independent = False)
@@ -189,7 +190,17 @@ for z in range(n_sim):
 	tmp_dur = np.nanmean(tmpDur, axis = 1)
 	cor_vec[z] = np.round(np.corrcoef(tmp_degree, tmp_dur)[0, 1], 3)
 
-fig, (ax1, ax2) = plt.subplots(nrows = 1, ncols = 2, figsize=(12,4))
+	# check isolates in the last 10 years
+	t_beg = time_horizon - 26 * 10
+	t_end = time_horizon
+	iso_vec = np.zeros(t_end - t_beg)
+	for t in range(t_beg, t_end): 
+		tmp_g = g[np.where((g[:, 2] <= t) & (g[:, 3] > t))]
+		in_rel = np.unique(tmp_g[:, :2])
+		iso_vec[t - t_beg] = 1 - in_rel.shape[0] / Npop
+	mean_iso[z] = np.mean(iso_vec)
+
+fig, (ax1, ax2, ax3) = plt.subplots(nrows = 1, ncols = 3, figsize=(18,4))
 density, bins = np.histogram(mean_deg, normed = True, density = True, bins = 20)
 unity_density = density / density.sum()
 widths = bins[:-1] - bins[1:]
@@ -210,6 +221,16 @@ ax2.set_xlabel('correlation coefficient')
 ax2.set_ylabel('density')
 ax2.set_title('correlation coefficient between degree and duration\n(' + str(n_sim) + 'simulations)')
 
+density, bins = np.histogram(mean_iso, normed = True, density = True, bins = 20)
+unity_density = density / density.sum()
+widths = bins[:-1] - bins[1:]
+ax3.bar(bins[1:], unity_density, width = widths, color = "cornflowerblue")
+ax3.axvline(mean_iso.mean(), color = 'orangered')
+ax3.text(mean_iso.mean(), 0, str(np.round(mean_iso.mean(), 3)))
+ax3.set_xlabel('%')
+ax3.set_ylabel('density')
+ax3.set_title('% population has no partners \n(' + str(n_sim) + 'simulations)')
+
 plt.tight_layout()
 plt.savefig('results/random dd cc duration (correlated).eps', format='eps', dpi=500)
 plt.clf()
@@ -219,6 +240,7 @@ n_sim = 500
 cor_vec = np.zeros(n_sim)
 p_in_vec = np.zeros(n_sim)
 mean_deg = np.zeros(n_sim)
+mean_iso = np.zeros(n_sim)
 
 same_cluster = np.tile(ID_cluster, (Npop, 1)).T == np.tile(ID_cluster, (Npop, 1))
 
@@ -250,7 +272,18 @@ for z in range(n_sim):
 	tmp_in_degree = np.sum(tmpCluster, axis = 1)
 	p_in_vec[z] = np.mean(tmp_in_degree / tmp_degree)
 
-fig, (ax1, ax2, ax3) = plt.subplots(nrows = 1, ncols = 3, figsize=(18, 4))
+	# check isolates in the last 10 years
+	t_beg = time_horizon - 26 * 10
+	t_end = time_horizon
+	iso_vec = np.zeros(t_end - t_beg)
+	for t in range(t_beg, t_end): 
+		tmp_g = g[np.where((g[:, 2] <= t) & (g[:, 3] > t))]
+		in_rel = np.unique(tmp_g[:, :2])
+		iso_vec[t - t_beg] = 1 - in_rel.shape[0] / Npop
+	mean_iso[z] = np.mean(iso_vec)
+
+
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows = 2, ncols = 2, figsize=(12, 8))
 density, bins = np.histogram(mean_deg, normed = True, density = True, bins = 20)
 unity_density = density / density.sum()
 widths = bins[:-1] - bins[1:]
@@ -280,6 +313,16 @@ ax3.text(p_in_vec.mean(), 0, str(np.round(p_in_vec.mean(), 3)))
 ax3.set_xlabel('% partners')
 ax3.set_ylabel('density')
 ax3.set_title('% partners in the same community\n(' + str(n_sim) + 'simulations)')
+
+density, bins = np.histogram(mean_iso, normed = True, density = True, bins = 20)
+unity_density = density / density.sum()
+widths = bins[:-1] - bins[1:]
+ax4.bar(bins[1:], unity_density, width = widths, color = "cornflowerblue")
+ax4.axvline(mean_iso.mean(), color = 'orangered')
+ax4.text(mean_iso.mean(), 0, str(np.round(mean_iso.mean(), 3)))
+ax4.set_xlabel('%')
+ax4.set_ylabel('density')
+ax4.set_title('% population has no partners \n(' + str(n_sim) + 'simulations)')
 
 plt.tight_layout()
 plt.savefig('results/community dd cc duration (correlated).eps', format='eps', dpi=500)
@@ -350,8 +393,8 @@ density, bins = np.histogram(mean_iso, normed = True, density = True, bins = 20)
 unity_density = density / density.sum()
 widths = bins[:-1] - bins[1:]
 ax3.bar(bins[1:], unity_density, width = widths, color = "cornflowerblue")
-ax3.axvline(p_in_vec.mean(), color = 'orangered')
-ax3.text(p_in_vec.mean(), 0, str(np.round(p_in_vec.mean(), 3)))
+ax3.axvline(mean_iso.mean(), color = 'orangered')
+ax3.text(mean_iso.mean(), 0, str(np.round(mean_iso.mean(), 3)))
 ax3.set_xlabel('%')
 ax3.set_ylabel('density')
 ax3.set_title('% population has no partners \n(' + str(n_sim) + 'simulations)')

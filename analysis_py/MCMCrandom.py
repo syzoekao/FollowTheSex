@@ -16,27 +16,30 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
+import warnings
+warnings.filterwarnings("ignore")
+
 nchain = 1
 
-pars = [29]
+pars = [14]
 pars_name = ["meanActs"]
 pars_lb = [10]
 pars_ub = [100]
 
-scales = {"meanActs": 0.1}
+scales = {"meanActs": 0.005}
 
-target_cum_dx = np.repeat(0.14, 9)
-sd_cum_dx = target_cum_dx * 0.1
+target_I = np.repeat(0.05, 260)
+sd_I = target_I * 0.1
 
-outcomes = mcmc.AdpativeMCMC(iters = 1000, burn_in = 100, adapt_par = [100, 100], \
+outcomes = mcmc.AdpativeMCMC(iters = 100, burn_in = 10, adapt_par = [10, 10], \
 	pars = pars, pars_name = pars_name, pars_lb = pars_lb, pars_ub = pars_ub, scales = scales, \
-	target = target_cum_dx, target_sd = sd_cum_dx, verbose = 1, function = net.SIR_net_generator, \
-	run = 1, Npop = 5000, years = 20, days = 14, \
-	strategy = "null", graph = "random", adjust_sex_acts = False, calibration = True)
+	target = target_I, target_sd = sd_I, verbose = 1, function = net.SIR_net_generator, \
+	run = 1, Npop = 5000, years = 50, days = 14, \
+	strategy = "PN", graph = "random", independent = True, calibration = True, analysis_window = 20)
+
 
 with open('cal_data/mcmc_results_' + str(nchain) + '.txt', 'w') as fout:
     json.dump(outcomes, fout)
-
 
 
 import matplotlib as mpl
