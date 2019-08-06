@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Introduction to network Structure &#8212; Follow The Sex  documentation</title>
+    <title>Network Structure &#8212; Follow The Sex  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,9 +32,75 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="introduction-to-network-structure">
-<h1>Introduction to network Structure<a class="headerlink" href="#introduction-to-network-structure" title="Permalink to this headline">¶</a></h1>
-<p>Simulation of sexual network for heterosexual population.</p>
+  <div class="section" id="network-structure">
+<h1>Network Structure<a class="headerlink" href="#network-structure" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p>The study includes three types of networks: random, community-structured, and scale-free.</p></li>
+<li><p>The population size is 5,000 individuals.</p></li>
+<li><p>Assumed the same average number of degree across types of network in the simulation time horizon.</p></li>
+<li><p>Time step is bi-weekly time step.</p></li>
+<li><dl class="simple">
+<dt>Simulate the network and disease transmission dynamics at two levels of disease prevalence: 5% and 20%.</dt><dd><ul>
+<li><p>The disease prevalence is the steady state prevalence given the standard partner management (partner notification).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Different levels of disease prevalence required different time horizon and analysis time:</p></li>
+</ul>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text"><strong>Target prevalence with PN</strong></span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Prevalence</p></th>
+<th class="head"><p>Timehorizon</p></th>
+<th class="head"><p>Strategy implemented in the burn-in period</p></th>
+<th class="head"><p>The initial time step a strategy is implemented</p></th>
+<th class="head"><p>Analysis window</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">5%</span></code></p></td>
+<td><p>50 years</p></td>
+<td><p>Annual screening alone</p></td>
+<td><p>At the 30th year</p></td>
+<td><p>Last 10 year of the simulation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">20%</span></code></p></td>
+<td><p>20 years</p></td>
+<td><p>Annual screening alone</p></td>
+<td><p>At the 8th year</p></td>
+<td><p>Last 10 year of the simulation</p></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="random-networks">
+<h2>Random networks<a class="headerlink" href="#random-networks" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><img src="fig/random.png" style="width: 80%">
+
+<img src="fig/random dd cc duration (correlated).eps" alt="random network output distribution"  style="width: 100%"></div></blockquote>
+</div>
+<div class="section" id="community-structured-networks">
+<h2>Community-structured networks<a class="headerlink" href="#community-structured-networks" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><img src="fig/community.png" style="width: 80%">
+
+<img src="fig/community dd cc duration (correlated).eps" alt="community network output distribution"  style="width: 100%"></div></blockquote>
+</div>
+<div class="section" id="scale-free-networks">
+<h2>Scale-free networks<a class="headerlink" href="#scale-free-networks" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><img src="fig/power_law.png" style="width: 80%">
+
+<img src="fig/power_law dd cc duration (correlated).eps" alt="power_law network output distribution"  style="width: 100%"></div></blockquote>
+</div>
 </div>
 
 
@@ -56,7 +122,12 @@
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to network Structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Network Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#random-networks">Random networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#community-structured-networks">Community-structured networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scale-free-networks">Scale-free networks</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="relationship.html">Correlation between degrees and relationship duration</a></li>
 </ul>
 

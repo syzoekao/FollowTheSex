@@ -11,7 +11,7 @@ Welcome to Follow The Sex's documentation!
    :caption: Contents:
 
    netstructure.rst
-   relationship.rst
+   calibration.rst
 
 
 Indices and tables
