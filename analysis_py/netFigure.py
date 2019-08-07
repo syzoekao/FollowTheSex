@@ -131,37 +131,35 @@ Check network generation:
 average degree, correlation between degree and duration 
 '''
 
-Npop = 5000
-years = 20
-days = 14 # 14 days; bi-weekly time step
-# graph_function = net.random_graph_generator
-strategy = "null" 
-meanActs = 27
+import numpy as np
+import timeit
+import netSTI.net as net
+import plotly.offline as offline
+import plotly.plotly as py
+import plotly.graph_objs as go
+import plotly.io as pio
+import plotly.tools as tls
+import cmocean
+import networkx as nx
+import pandas as pd
+from networkx.drawing.nx_agraph import graphviz_layout
+import matplotlib as mpl
+print(mpl.rcParams['backend'])
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+plt.get_backend()
+import itertools
+import os
+os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
+cwd = os.getcwd()
+print(cwd)
 
-
-Ndegree = 4 * years
+years = 5
+days = 14
 unit_per_year = int(365 / days)
 time_horizon = unit_per_year * years
-acts = meanActs / unit_per_year
-
-init_prev, pInf, pCondom, redCondom, pRec, pScr, \
-pContact_PN, pContact_ept, pContact_tr, p_treat_PN, p_treat_ept, p_treat_tr, \
-max_contact, max_ept, alpha, cMedicine, cInvestigate, cTest, \
-n_cluster, q, discount_rate = net.get_params(unit_per_year)
-
-
-init_inf = int(Npop * init_prev)
-ID = np.arange(Npop)
-S = np.ones(Npop)
-I = np.zeros(Npop)
-T = np.zeros(Npop) # this state is only for recording time of treatment
-
-ID_cluster = (np.floor(ID / (Npop/n_cluster)) + 1).astype(int)
-init_select = np.where(ID_cluster == 1)[0]
-infID = np.sort(np.random.choice(init_select, init_inf, replace = False))
-I[infID] = 1
-S[infID] = 0
-
+Npop = 5000
 
 n_sim = 500
 cor_vec = np.zeros(n_sim)
@@ -169,15 +167,16 @@ mean_deg = np.zeros(n_sim)
 mean_iso = np.zeros(n_sim)
 for z in range(n_sim): 
 	print(z)
-	g = net.random_graph_generator(ID, Npop, Ndegree, time_horizon, independent = False)
-	tmpMatrix = np.zeros((Npop, Npop))
-	for i in range(g.shape[0]): 
-		x = g[i, 0]
-		y = g[i, 1]
-		tmpMatrix[x, y] = 1
-		tmpMatrix[y, x] = 1
-	tmp_degree = np.sum(tmpMatrix, axis = 1)
-	mean_deg[z] = np.mean(tmp_degree)
+	run = np.random.choice(np.arange(100000), 1)
+	g, avg_deg = net.SIR_net_generator(run, Npop = Npop, years = 5, days = 14, 
+		graph = "random", pEFoI = (1 / 5000) / 2 , 
+		pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
+		p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
+		independent = False, calibration = False, 
+		analysis_window = 2, output_net = True)
+	
+	tmp_ix, tmp_degree = np.unique(g[:, :2], return_counts = True)
+	mean_deg[z] = np.sum(tmp_degree) / Npop
 
 	tmpDur = np.zeros((Npop, Npop))
 	tmpDur[:, :] = np.nan
@@ -191,7 +190,7 @@ for z in range(n_sim):
 	cor_vec[z] = np.round(np.corrcoef(tmp_degree, tmp_dur)[0, 1], 3)
 
 	# check isolates in the last 10 years
-	t_beg = time_horizon - 26 * 10
+	t_beg = time_horizon - unit_per_year * 2
 	t_end = time_horizon
 	iso_vec = np.zeros(t_end - t_beg)
 	for t in range(t_beg, t_end): 
@@ -246,16 +245,16 @@ same_cluster = np.tile(ID_cluster, (Npop, 1)).T == np.tile(ID_cluster, (Npop, 1)
 
 for z in range(n_sim): 
 	print(z)
-	g = net.community_graph_generator(ID, Npop, Ndegree, ID_cluster, time_horizon, \
-		pCluster = 0.99, independent = False)
-	tmpMatrix = np.zeros((Npop, Npop))
-	for i in range(g.shape[0]): 
-		x = g[i, 0]
-		y = g[i, 1]
-		tmpMatrix[x, y] = 1
-		tmpMatrix[y, x] = 1
-	tmp_degree = np.sum(tmpMatrix, axis = 1)
-	mean_deg[z] = np.mean(tmp_degree)
+	run = np.random.choice(np.arange(100000), 1)
+	g, avg_deg = net.SIR_net_generator(run, Npop = Npop, years = 5, days = 14, 
+		graph = "community", pEFoI = (1 / 5000) / 2 , 
+		pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
+		p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
+		independent = False, calibration = False, 
+		analysis_window = 2, output_net = True)
+
+	tmp_ix, tmp_degree = np.unique(g[:, :2], return_counts = True)
+	mean_deg[z] = np.sum(tmp_degree) / Npop
 
 	tmpDur = np.zeros((Npop, Npop))
 	tmpDur[:, :] = np.nan
@@ -273,7 +272,7 @@ for z in range(n_sim):
 	p_in_vec[z] = np.mean(tmp_in_degree / tmp_degree)
 
 	# check isolates in the last 10 years
-	t_beg = time_horizon - 26 * 10
+	t_beg = time_horizon - 26 * 2
 	t_end = time_horizon
 	iso_vec = np.zeros(t_end - t_beg)
 	for t in range(t_beg, t_end): 
@@ -329,21 +328,105 @@ plt.savefig('results/community dd cc duration (correlated).eps', format='eps', d
 plt.clf()
 
 
+
 n_sim = 500
 cor_vec = np.zeros(n_sim)
 mean_deg = np.zeros(n_sim)
 mean_iso = np.zeros(n_sim)
 for z in range(n_sim): 
 	print(z)
-	g = net.power_law_graph_generator(ID, Npop, time_horizon, n_yrs = 20, independent = False)
-	tmpMatrix = np.zeros((Npop, Npop))
+	run = np.random.choice(np.arange(100000), 1)
+	g, avg_deg = net.SIR_net_generator(run, Npop = Npop, years = 5, days = 14, 
+		graph = "power_law", pEFoI = (1 / 5000) / 2 , 
+		pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
+		p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
+		independent = False, calibration = False, 
+		analysis_window = 2, output_net = True)
+
+	tmp_ix, tmp_n = np.unique(g[:, :2], return_counts = True)
+	tmp_degree = np.zeros(Npop)
+	tmp_degree[tmp_ix] = tmp_n
+	mean_deg[z] = np.sum(tmp_degree) / Npop
+
+	tmpDur = np.zeros((Npop, Npop))
+	tmpDur[:, :] = np.nan
+	g_dur = g[:, 3] - g[:, 2]
 	for i in range(g.shape[0]): 
 		x = g[i, 0]
 		y = g[i, 1]
-		tmpMatrix[x, y] = 1
-		tmpMatrix[y, x] = 1
-	tmp_degree = np.sum(tmpMatrix, axis = 1)
-	mean_deg[z] = np.mean(tmp_degree)
+		tmpDur[x, y] = g_dur[i]
+		tmpDur[y, x] = g_dur[i]
+	tmp_dur = np.nanmean(tmpDur, axis = 1)
+	tmp_ix = np.isnan(tmp_dur)
+	cor_vec[z] = np.round(np.corrcoef(tmp_degree[~tmp_ix], tmp_dur[~tmp_ix])[0, 1], 3)
+
+	# check isolates in the last 10 years
+	t_beg = time_horizon - 26 * 2
+	t_end = time_horizon
+	iso_vec = np.zeros(t_end - t_beg)
+	for t in range(t_beg, t_end): 
+		tmp_g = g[np.where((g[:, 2] <= t) & (g[:, 3] > t))]
+		in_rel = np.unique(tmp_g[:, :2])
+		iso_vec[t - t_beg] = 1 - in_rel.shape[0] / Npop
+	mean_iso[z] = np.mean(iso_vec)
+
+
+fig, (ax1, ax2, ax3) = plt.subplots(nrows = 1, ncols = 3, figsize=(18, 4))
+density, bins = np.histogram(mean_deg, normed = True, density = True, bins = 20)
+unity_density = density / density.sum()
+widths = bins[:-1] - bins[1:]
+ax1.bar(bins[1:], unity_density, width = widths, color = "cornflowerblue")
+ax1.axvline(mean_deg.mean(), color = 'orangered')
+ax1.text(mean_deg.mean(), 0, str(np.round(mean_deg.mean(), 3)))
+ax1.set_xlabel('degree')
+ax1.set_ylabel('density')
+ax1.set_title('average degree\n(' + str(n_sim) + 'simulations)')
+
+density, bins = np.histogram(cor_vec, normed = True, density = True, bins = 20)
+unity_density = density / density.sum()
+widths = bins[:-1] - bins[1:]
+ax2.bar(bins[1:], unity_density, width = widths, color = "cornflowerblue")
+ax2.axvline(cor_vec.mean(), color = 'orangered')
+ax2.text(cor_vec.mean(), 0, str(np.round(cor_vec.mean(), 3)))
+ax2.set_xlabel('correlation coefficient')
+ax2.set_ylabel('density')
+ax2.set_title('correlation coefficient between degree and duration\n(' + str(n_sim) + 'simulations)')
+
+density, bins = np.histogram(mean_iso, normed = True, density = True, bins = 20)
+unity_density = density / density.sum()
+widths = bins[:-1] - bins[1:]
+ax3.bar(bins[1:], unity_density, width = widths, color = "cornflowerblue")
+ax3.axvline(mean_iso.mean(), color = 'orangered')
+ax3.text(mean_iso.mean(), 0, str(np.round(mean_iso.mean(), 3)))
+ax3.set_xlabel('%')
+ax3.set_ylabel('density')
+ax3.set_title('% population has no partners \n(' + str(n_sim) + 'simulations)')
+
+plt.tight_layout()
+plt.savefig('results/power_law dd cc duration (correlated).eps', format='eps', dpi=500)
+plt.clf()
+
+
+
+
+n_sim = 500
+cor_vec = np.zeros(n_sim)
+mean_deg = np.zeros(n_sim)
+mean_iso = np.zeros(n_sim)
+for z in range(n_sim): 
+	run = np.random.choice(np.arange(10000), 1)
+	print(z)
+	g, avg_deg = net.SIR_net_generator(run, Npop = Npop, years = 5, days = 14, 
+		graph = "empirical", pEFoI = (1 / 5000) / 2 , 
+		pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
+		p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
+		independent = False, calibration = False, 
+		analysis_window = 2, output_net = True)
+
+	tmp_ix, tmp_n = np.unique(g[:, :2], return_counts = True)
+	tmp_degree = np.zeros(Npop)
+	tmp_degree[tmp_ix] = tmp_n
+	mean_deg[z] = np.sum(tmp_degree) / Npop
 
 	tmpDur = np.zeros((Npop, Npop))
 	tmpDur[:, :] = np.nan
@@ -400,8 +483,10 @@ ax3.set_ylabel('density')
 ax3.set_title('% population has no partners \n(' + str(n_sim) + 'simulations)')
 
 plt.tight_layout()
-plt.savefig('results/power_law dd cc duration (correlated).eps', format='eps', dpi=500)
+plt.savefig('results/empirical dd cc duration (correlated).eps', format='eps', dpi=500)
 plt.clf()
+
+
 
 
 
