@@ -27,12 +27,13 @@ def seed_rng(**_):
     np.random.seed()
 
 @app.task
-def sim_task(run, par_vec, strategy, indep, graph): 
-    return net.SIR_net_generator(meanActs = par_vec[run], run = run, 
-        Npop = 5000, years = 20, days = 14, strategy = strategy, graph = graph, 
-        pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
-        p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
-        independent = indep, calibration = True, analysis_window = 12)
+def sim_task(run, indep, graph): 
+    return net.SIR_net_generator(run, Npop = 5000, years = 5, days = 14, 
+    graph = graph, pEFoI = (1 / 5000) / 2 , 
+    pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
+    p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
+    independent = indep, calibration = False, 
+    analysis_window = 2, output_net = True)
 
 
 if __name__ == "__main__":
@@ -41,18 +42,23 @@ if __name__ == "__main__":
     print(cwd)
 
     graph = "power_law"
-    strategy = "tracing"
-    indep = False
+    indep = True
+    n_samp = 500
 
-    n_samp = 100
-    par_vec = post.SamplePosterior(g = graph, target_prev = 0.20, indep = indep).sample_from_posterior(n_samp)
-    par_vec = par_vec.tolist()
+    if indep == True: 
+        cor_or_not = "Uncorr"
+    else: 
+        cor_or_not = "Corr"
+
+    # n_samp = 100
+    # par_vec = post.SamplePosterior(g = graph, target_prev = 0.20, indep = indep).sample_from_posterior(n_samp)
+    # par_vec = par_vec.tolist()
 
     start_time = time.time()
-    ret = ResultSet([sim_task.delay(i, par_vec, strategy, indep, graph) for i in range(n_samp)])
+    ret = ResultSet([sim_task.delay(i, indep, graph) for i in range(n_samp)])
     print(len(ret.get()))
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
 
-    with open('results/trend/trend_' + graph + '_adjusted (' + strategy + ').txt', 'w') as fout:
+    with open('results/netout/netout_' + graph + cor_or_not + '.txt', 'w') as fout:
         json.dump(ret.get(), fout)
