@@ -1,3 +1,4 @@
+import timeit
 import time
 import numpy as np
 import os
@@ -7,7 +8,6 @@ from celery import Celery
 from celery.result import ResultSet
 import celery.signals
 import netSTI.net as net
-import netSTI.posterior as post
 
 import os
 os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
@@ -33,7 +33,7 @@ def sim_task(run, indep, graph):
     pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
     p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
     independent = indep, calibration = False, 
-    analysis_window = 2, output_net = True)
+    analysis_window = 2, output_netsum = True, output_net = False)
 
 
 if __name__ == "__main__":
@@ -60,5 +60,5 @@ if __name__ == "__main__":
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
 
-    with open('results/netout/netout_' + graph + cor_or_not + '.txt', 'w') as fout:
+    with open('results/netout/netout_' + graph + '_' + cor_or_not + '.txt', 'w') as fout:
         json.dump(ret.get(), fout)
