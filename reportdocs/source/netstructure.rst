@@ -1,7 +1,7 @@
 Network Structure
 ************************************
 
-* The study includes three types of networks: random, community-structured, and scale-free. 
+* The study includes four types of networks: random, community-structured, scale-free (power law), and an empirical degree distribution. 
 * The population size is 5,000 individuals. 
 * Assumed the same average number of degree across types of network in the simulation time horizon. 
 * Time step is bi-weekly time step. 

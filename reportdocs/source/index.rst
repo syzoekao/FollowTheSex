@@ -11,7 +11,8 @@ Welcome to Follow The Sex's documentation!
    :caption: Contents:
 
    netstructure.rst
-   calibration.rst
+   copula.rst
+   scenarios.rst
 
 
 Indices and tables
