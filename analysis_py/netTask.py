@@ -29,8 +29,8 @@ def seed_rng(**_):
 @app.task
 def sim_task(run, indep, graph, pEFoI): 
     return netSTI.SIR_net_generator(run, 5000, years = 5, days = 14, 
-    graph = graph, pEFoI = pEFoI, independent = indep, base_case = False, 
-    trend = False, analysis_window = 5, output_netsum = False, output_net = False)
+    graph = graph, pEFoI = pEFoI, independent = indep, corr_scr = False, base_case = True, 
+    trend = True, analysis_window = 5, output_netsum = False, output_net = False)
 
 
 
@@ -39,10 +39,10 @@ if __name__ == "__main__":
     cwd = os.getcwd()
     print(cwd)
 
-    graph = "random"
-    indep = False
-    pEFoI = (1 / 5000) / 2 
-    n_samp = 500
+    graph = "community"
+    indep = True
+    pEFoI = (1 / 5000) / 2 * 10
+    n_samp = 300
 
     if indep == True: 
         cor_or_not = "Uncorr"

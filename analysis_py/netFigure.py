@@ -1,3 +1,76 @@
+'''
+Check degree distribution of power law
+'''
+import numpy as np
+import netSTI.netSTI as netSTI
+import netSTI.mydata as data
+import pandas as pd
+import json
+import matplotlib as mpl
+from sklearn.linear_model import LinearRegression
+import copy
+from pylab import *
+print(mpl.rcParams['backend'])
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
+plt.get_backend()
+import os
+os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
+cwd = os.getcwd()
+print(cwd)
+
+Npop = 5000
+ID = np.arange(Npop)
+dur = data.SexBehavior().dur
+dur_dist = data.SexBehavior().dur_dist
+years = 5
+Ndegree = 4 * years
+days = 14
+unit_per_year = int(365 / days)
+time_horizon = unit_per_year * years
+
+nsamp = 100
+fit_vec = np.zeros(nsamp)
+avg_deg = np.zeros(nsamp)
+
+fig = plt.figure(figsize=(6,4))
+ax = plt.gca()
+for run in range(nsamp): 
+    print(run)
+    rel_hist = netSTI.SIR_net_generator(run, Npop, years = 5, days = 14, 
+    graph = "power_law", pEFoI = 0.0001, independent = True, base_case = False, 
+    trend = False, analysis_window = 2, output_netsum = False, output_net = True)
+
+    tmp_rel = rel_hist[(rel_hist[:, 3] >= (3 * unit_per_year))]
+    tmp_names, tmp_degree = np.unique(tmp_rel[:, :2], return_counts = True)
+    degree, counts = np.unique(tmp_degree, return_counts = True)
+    degree_dist = counts / np.sum(counts)
+    fit = np.polyfit(np.log(degree), np.log(degree_dist), 1)
+    fit_vec[run] = fit[1]
+    fit_fn = np.poly1d(fit)
+    avg_deg[run] = np.sum(tmp_degree) / Npop
+    ax.scatter(np.log(degree), np.log(degree_dist), edgecolor = 'limegreen', facecolors='none')
+    ax.plot(np.log(degree), fit_fn(np.log(degree)), 'royalblue')
+
+x_ticks = np.array([0.1, 1, 2, 3, 4, 5])
+y_ticks = np.array([-8, -6, -4, -2, -0.1])
+ax.set_xticks(x_ticks)
+ax.set_xticklabels(np.round(np.exp(x_ticks)))
+ax.set_yticks(y_ticks)
+ax.set_yticklabels(np.round(np.exp(y_ticks), 3))
+ax.text(0.1, -7, 'mean of the slope is\n' + str(np.round(np.mean(fit_vec), 2)) + \
+    '\naverage mean degree\n(last 2 years):\n' + str(np.round(np.mean(avg_deg), 2)), fontsize=12)
+plt.xlabel('degree')
+plt.ylabel('proportion')
+plt.title('100 network samples')
+plt.savefig('results/power law degree distribution.eps', format='eps', dpi=1000)
+
+
+
+'''
+Network configuration plots
+'''
+
 import numpy as np
 import timeit
 import netSTI.net as net
