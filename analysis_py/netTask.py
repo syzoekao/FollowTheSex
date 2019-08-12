@@ -39,9 +39,9 @@ if __name__ == "__main__":
     cwd = os.getcwd()
     print(cwd)
 
-    graph = "community"
+    graph = "power_law"
     indep = True
-    pEFoI = (1 / 5000) / 2 * 10
+    pEFoI = (1 / 5000) / 2 
     n_samp = 2000
 
     if indep == True: 

@@ -23,7 +23,7 @@ mydata = lapply(c("randomDF", "communityDF", "powerLawDF"), function(g){
   PN = aggregate(cbind(prevalence, newI, tot_person_time, ever_infected_node, avg_num_inf10, TotalCost, yUtil) ~ strategy + p_treat_PN, mydata, mean)
   colnames(PN)[colnames(PN) %in% "p_treat_PN"] = "pr"
   PN.se = aggregate(cbind(prevalence, newI, tot_person_time, ever_infected_node, avg_num_inf10, TotalCost, yUtil) ~ strategy + p_treat_PN, mydata,  
-                      function(x) sd(x, na.rm = T)/(5000^0.5))
+                    function(x) sd(x, na.rm = T)/(5000^0.5))
   PN.se = PN.se[, -c(1,2)]
   colnames(PN.se) = paste0("se.", colnames(PN.se))
   PN = cbind(PN, PN.se)
@@ -31,7 +31,7 @@ mydata = lapply(c("randomDF", "communityDF", "powerLawDF"), function(g){
   EPT = aggregate(cbind(prevalence, newI, tot_person_time, ever_infected_node, avg_num_inf10, TotalCost, yUtil) ~ strategy + p_treat_ept, mydata, mean)
   colnames(EPT)[colnames(EPT) %in% "p_treat_ept"] = "pr"
   EPT.se = aggregate(cbind(prevalence, newI, tot_person_time, ever_infected_node, avg_num_inf10, TotalCost, yUtil) ~ strategy + p_treat_ept, mydata,  
-                    function(x) sd(x, na.rm = T)/(5000^0.5))
+                     function(x) sd(x, na.rm = T)/(5000^0.5))
   EPT.se = EPT.se[, -c(1, 2)]
   colnames(EPT.se) = paste0("se.", colnames(EPT.se))
   EPT = cbind(EPT, EPT.se) 
@@ -40,7 +40,7 @@ mydata = lapply(c("randomDF", "communityDF", "powerLawDF"), function(g){
   colnames(Tracing)[colnames(Tracing) %in% "p_treat_tr"] = "pr"
   Tracing$strategy = "Tracing"
   Tracing.se = aggregate(cbind(prevalence, newI, tot_person_time, ever_infected_node, avg_num_inf10, TotalCost, yUtil) ~ strategy + p_treat_tr, mydata,  
-                     function(x) sd(x, na.rm = T)/(5000^0.5))
+                         function(x) sd(x, na.rm = T)/(5000^0.5))
   Tracing.se = Tracing.se[, -c(1, 2)]
   colnames(Tracing.se) = paste0("se.", colnames(Tracing.se))
   Tracing = cbind(Tracing, Tracing.se) 
@@ -214,7 +214,7 @@ CE.function = function(data, p_treat_PN, p_treat_EPT, wtp = 100000) {
   val_vec = as.numeric(as.character(ce.df$ICER))
   opt.st = ce.df$strategy[ce.df$ICER==as.character(max(val_vec[val_vec<wtp], na.rm= T))]
   if(length(opt.st) == 0) { opt.st = 'NULL'}
-
+  
   return(list(ce.df = ce.df, opt = opt.st))
 }
 
@@ -230,8 +230,8 @@ for(j in c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)) {
 }
 
 random_mat = ifelse(random_mat == "NULL", 0, 
-                       ifelse(random_mat == "PN", 1, 
-                              ifelse(random_mat == "EPT", 2, 3)))
+                    ifelse(random_mat == "PN", 1, 
+                           ifelse(random_mat == "EPT", 2, 3)))
 
 
 community_mat = matrix(NA, nrow = 10, ncol = 10)
@@ -245,8 +245,8 @@ for(j in c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)) {
 }
 
 community_mat = ifelse(community_mat == "NULL", 0, 
-                      ifelse(community_mat == "PN", 1, 
-                             ifelse(community_mat == "EPT", 2, 3)))
+                       ifelse(community_mat == "PN", 1, 
+                              ifelse(community_mat == "EPT", 2, 3)))
 
 
 powerLaw_mat = matrix(NA, nrow = 10, ncol = 10)
@@ -394,7 +394,7 @@ model <- function() {
   beta[1] ~ dnorm(slo.C, tau.slo.C)
   beta0[2] ~ dnorm(int.U, tau.int.U)
   beta[2] ~ dnorm(slo.U, tau.slo.U)
-    
+  
   tau[1] ~ dgamma(0.001, 0.001)
   sigma[1] <- 1/sqrt(tau[1])
   tau[2] ~ dgamma(0.001, 0.001)
@@ -474,7 +474,7 @@ CE.function = function(data, p_treat_PN, p_treat_EPT, wtp = 100000) {
   null.set = data[data$strategy == "NULL", ]
   tmp.PN = data[(data$strategy == "PN") & (data$pr == round(p_treat_PN,2)), ]
   # tmp.Tr = data[(data$strategy == "Tracing") & (data$pr == round(max(c(p_treat_PN, p_treat_EPT)),2)), ]
-  tmp.Tr = data[(data$strategy == "Tracing") & (data$pr == round(min(c(p_treat_PN, p_treat_EPT)),2)), ]
+  tmp.Tr = data[(data$strategy == "Tracing") & (data$pr == round(max(c(p_treat_PN, p_treat_EPT)),2)), ]
   tmp.EPT = data[(data$strategy == "EPT") & (data$pr == round(p_treat_EPT,2)), ]
   tmp.dat = rbind(null.set, tmp.EPT, tmp.PN, tmp.Tr)
   tmp.dat = data.frame(tmp.dat)
@@ -616,7 +616,7 @@ cropWithRowCol <- function(r, rows, cols) {
 library(raster)
 setEPS()
 # postscript('/Users/szu-yukao/Documents/Network_structure_and_STI/writing/sensitivity plot_smooth_10000 (base case 10 years).eps', height = 15, width = 20)
-png('/Users/szu-yukao/Documents/Network_structure_and_STI/writing/sensitivity plot_smooth_100000 (base case 10 years).png', height = 1500, width = 2000)
+png('/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI/results/RRsummary/sensitivity plot_smooth_100000 (base case 10 years).png', height = 1500, width = 2000)
 
 par(mar=c(6, 8, 5, 3), oma = c(0, 0, 0, 0)) # oma=c(1,1,3,0))
 layout(matrix(c(1,2,3,4),byrow = T, ncol=2),heights=c(5, 5))
@@ -942,14 +942,11 @@ p <- plot_ly(
   z = z, 
   type = "contour"
 ) %>% layout(
-    title = paste0(g, "DF"),
-    scene = list(
-      xaxis = list(title = "p_treat_PN"),
-      yaxis = list(title = "p_treat_EPT" ),  
-      zaxis = list(title = "Expected Loss($)")
-    ))
-
-
-
+  title = paste0(g, "DF"),
+  scene = list(
+    xaxis = list(title = "p_treat_PN"),
+    yaxis = list(title = "p_treat_EPT" ),  
+    zaxis = list(title = "Expected Loss($)")
+  ))
 
 

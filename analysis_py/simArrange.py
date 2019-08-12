@@ -96,7 +96,7 @@ def get_sim_result(graph, lvl, cor_or_not, texts = ''):
 	return out_file, file_name
 
 
-txt = '(corr_scr 2yrs)'
+txt = '(corr_scr 5yrs)'
 
 graph_key = ['random', 'community', 'power_law', 'empirical']
 
@@ -125,7 +125,7 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-txt = '(corr_scr 2yrs)'
+txt = '(uncorr_scr 5yrs)'
 graph_key = ['random', 'community', 'power_law', 'empirical']
 
 for cor_or_not in ['Uncorr', 'Corr']:
@@ -142,10 +142,11 @@ for cor_or_not in ['Uncorr', 'Corr']:
 			('ept', 0.79, 'mean'), ('ept', 0.79, 'std'), ('trace', 0.79, 'mean'), ('trace', 0.79, 'std')]
 			sum_out = sum_out.loc[ix_ls]
 			sum_out['graph'] = graph_key[g]
-			sum_out = sum_out[['graph', 'I', 'newI', 'averageTimesInfected_norm', 'corr_timesInf_and_degree', \
-			'tot_person_time', 'TotalCost', 'CostMedicine', 'CostTracing', 'CostTest', 
-			'nExtSeed', 'nTest', 'nScreen', 'nDeliver', 'nContactTrace', 'nNotified', 'nTrueTreat', 'nOvertreat', 
-			'nTrueTreatIntervention', 'pEfficient', 'pEverInfected', \
+			sum_out = sum_out[['graph', 'tot_person_time', 'TotalCost', 'I', 'newI', \
+			'averageTimesInfected_norm', 'corr_timesInf_and_degree', \
+			'n_part6mon', 'nDeliver', 'nContactTrace', 'nNotified', \
+			'CostMedicine', 'CostTracing', 'CostTest', 'nExtSeed', 'nTest', 'nScreen', \
+			'nTrueTreat', 'nOvertreat', 'nTrueTreatIntervention', 'pEfficient', 'pEverInfected', \
 			'nIntervention', 'pEverBeenIntervention', 'avgTimesBeenIntervene', 
 			'corr_PT_and_degree']]
 		
