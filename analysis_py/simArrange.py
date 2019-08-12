@@ -96,15 +96,16 @@ def get_sim_result(graph, lvl, cor_or_not, texts = ''):
 	return out_file, file_name
 
 
-txt = '(corr_scr 5yrs)'
+txt = '(corr_scr 2yrs)'
 
 graph_key = ['random', 'community', 'power_law', 'empirical']
-lvl = 'Low'
-cor_or_not = "Uncorr"
 
-for graph in graph_key: 
-	tmp_df, file_name = get_sim_result(graph, lvl, cor_or_not, texts = txt)
-	tmp_df.to_csv('results/RRresults/' + file_name + '.csv', index = False)
+
+for cor_or_not in ['Uncorr', 'Corr']:
+	for lvl in ['Low', 'High']: 
+		for graph in graph_key: 
+			tmp_df, file_name = get_sim_result(graph, lvl, cor_or_not, texts = txt)
+			tmp_df.to_csv('results/RRresults/' + file_name + '.csv', index = False)
 
 
 
@@ -124,7 +125,7 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-txt = '(corr_scr 5yrs)'
+txt = '(corr_scr 2yrs)'
 graph_key = ['random', 'community', 'power_law', 'empirical']
 
 for cor_or_not in ['Uncorr', 'Corr']:
@@ -152,4 +153,5 @@ for cor_or_not in ['Uncorr', 'Corr']:
 	
 		output_list = pd.concat(output_list)
 		output_list.to_csv('results/RRsummary/sum_' + cor_or_not + lvl + txt + '.csv')
+
 

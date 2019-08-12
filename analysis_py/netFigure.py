@@ -73,7 +73,7 @@ Network configuration plots
 
 import numpy as np
 import timeit
-import netSTI.net as net
+import netSTI.netSTI as netSTI
 import plotly.offline as offline
 import plotly.plotly as py
 import plotly.graph_objs as go
@@ -109,15 +109,12 @@ n_yrs = 5
 Npop = 1000
 ID = np.arange(Npop)
  
-el = net.SIR_net_generator(run = 30, Npop = Npop, years = 5, days = 14, 
-    graph = graph, pEFoI = (1 / 5000) / 2 , 
-    pContact_PN = 0.49, pContact_ept = 0.7, pContact_tr = 0.7, 
-    p_treat_PN = 0.71, p_treat_ept = 0.79, p_treat_tr = 0.79, 
-    independent = indep, calibration = False, 
-    analysis_window = 2, output_netsum = False, output_net = True)
+el = netSTI.SIR_net_generator(500, Npop, years = 5, days = 14, 
+    graph = graph, pEFoI = (1 / 5000) * 2, independent = indep, corr_scr = True, base_case = False, 
+    trend = False, analysis_window = 5, output_netsum = False, output_net = True)
 
 
-fig_window = (n_yrs * 26 - 3 * 26)
+fig_window = (n_yrs * 26 - 4 * 26)
 tmp_el = el[np.where(el[:, 3] >= fig_window)]
 
 sex_array = np.zeros((Npop, Npop))

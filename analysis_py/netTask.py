@@ -29,8 +29,8 @@ def seed_rng(**_):
 @app.task
 def sim_task(run, indep, graph, pEFoI): 
     return netSTI.SIR_net_generator(run, 5000, years = 5, days = 14, 
-    graph = graph, pEFoI = pEFoI, independent = indep, corr_scr = False, base_case = True, 
-    trend = True, analysis_window = 5, output_netsum = False, output_net = False)
+    graph = graph, pEFoI = pEFoI, independent = indep, corr_scr = True, base_case = False, 
+    trend = False, analysis_window = 5, output_netsum = False, output_net = False)
 
 
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     graph = "community"
     indep = True
     pEFoI = (1 / 5000) / 2 * 10
-    n_samp = 300
+    n_samp = 2000
 
     if indep == True: 
         cor_or_not = "Uncorr"
@@ -60,5 +60,5 @@ if __name__ == "__main__":
     end_time = time.time()
     print("CeleryTime:", end_time - start_time)
 
-    with open('results/RRresults/trend/' + graph + '_' + cor_or_not + lvl + '.txt', 'w') as fout:
+    with open('results/RRresults/' + graph + cor_or_not + lvl + '.txt', 'w') as fout:
         json.dump(ret.get(), fout)
