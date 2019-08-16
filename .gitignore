@@ -18,9 +18,12 @@ __pycache__/
 .Rhistory
 .Rproj.user/
 sensitivity\ CEA.R
-sensitivity\ CEA_RR.R
+sensitivityCEA_RR.R
 powerlawCalc.R
-network\ animaltion.R
+network\ animation.R
+net_out_file.R
+PowerLawDist*.txt
+reportdocs/
 
 
 ## exclude library except for netSTI folder
