@@ -166,17 +166,17 @@ node_trace = go.Scatter(
 		colorscale = thermal, 
 		reversescale = False,
 		cmin = 0, 
-		cmax = 41, 
+		cmax = 50, 
 		color = [],
 		size = [],
-		colorbar = dict(
-			thickness = 15,
-			title = 'degree',
-			tickvals = np.arange(41), 
-			ticktext = np.arange(41), 
-			xanchor = 'left',
-			titleside = 'right'
-		),
+		# colorbar = dict(
+		# 	thickness = 15,
+		# 	title = 'degree',
+		# 	tickvals = np.arange(50), 
+		# 	ticktext = np.arange(50), 
+		# 	xanchor = 'left',
+		# 	titleside = 'right'
+		# ),
 		line = dict(width = 2, 
 				color = '#000')))
 
@@ -186,10 +186,14 @@ node_trace['y'] = attr_pos[:, 1]
 node_trace['marker']['size'] = np.repeat(10, Npop)
 node_trace['marker']['color'] = n_degree
 
+g_title = graph
+if graph == "power_law": 
+	g_title = "scale-free"
+
 fig = go.Figure(data=[edge_trace, node_trace],
 	layout = go.Layout(
-		title = '<br>' + graph + ' network',
-		titlefont = dict(size = 30),
+		title = '<br>' + '(D) ' + g_title + ' network',
+		titlefont = dict(size = 60),
 		showlegend = False,
 		hovermode = 'closest',
 		margin = dict(b = 20, l = 5, r = 5, t = 40),
@@ -208,7 +212,7 @@ average degree, correlation between degree and duration
 import numpy as np
 import timeit
 import json
-import netSTI.net as net
+import netSTI.netSTI as netSTI
 import plotly.offline as offline
 import plotly.plotly as py
 import plotly.graph_objs as go
@@ -245,7 +249,7 @@ plt.close('all')
 
 fig, ((ax1, ax2, ax3), (ax4, ax5, ax6)) = plt.subplots(nrows = 2, ncols = 3, figsize=(16, 8))
 for g in range(len(graph)): 
-	with open('results/netout/netout_' + graph[g] + '_' + cor_or_not + '.txt') as json_file:  
+	with open('results/netout/netout_' + graph[g] + '' + cor_or_not + '1000sim.txt') as json_file:  
 		ret = json.load(json_file)
 
 	key_ls = [k for k, v in ret[0].items()]
@@ -259,6 +263,7 @@ for g in range(len(graph)):
 	ax1.bar(bins[1:], unity_density, width = widths, color = bar_col[g], alpha = 0.6)
 	lty[g] = ax1.axvline(result[:, 0].mean(), color = 'k', linestyle = line_type[g])
 	# ax1.text(result[:, 0].mean(), 0, str(np.round(result[:, 0].mean(), 3)))
+	ax1.set_xlim([17, 22])
 	ax1.set_xlabel('degree')
 	ax1.set_ylabel('density')
 	ax1.set_title('Degree over 5 years')
@@ -269,9 +274,10 @@ for g in range(len(graph)):
 	ax2.bar(bins[1:], unity_density, width = widths, color = bar_col[g], alpha = 0.6)
 	lty[g] = ax2.axvline(result[:, 1].mean(), color = 'k', linestyle = line_type[g])
 	# ax2.text(result[:, 1].mean(), 0, str(np.round(result[:, 1].mean(), 3)))
+	ax2.set_xlim([7, 10])
 	ax2.set_xlabel('degree')
 	ax2.set_ylabel('density')
-	ax2.set_title('Degree over the evaluation window')
+	ax2.set_title('Degree over the evaluation window\n(last 2 years)')
 
 	density, bins = np.histogram(result[:, 2], normed = True, density = True, bins = 20)
 	unity_density = density / density.sum()
@@ -279,6 +285,7 @@ for g in range(len(graph)):
 	ax3.bar(bins[1:], unity_density, width = widths, color = bar_col[g], alpha = 0.6)
 	lty[g] = ax3.axvline(result[:, 2].mean(), color = 'k', linestyle = line_type[g])
 	# ax5.text(result[:, 2].mean(), 0, str(np.round(result[:, 2].mean(), 3)))
+	ax3.set_xlim([1, 1.4])
 	ax3.set_xlabel('degree')
 	ax3.set_ylabel('density')
 	ax3.set_title('Degree at each time step')
@@ -289,9 +296,10 @@ for g in range(len(graph)):
 	ax4.bar(bins[1:], unity_density, width = widths, color = bar_col[g], alpha = 0.6)
 	lty[g] = ax4.axvline(result[:, 3].mean(), color = 'k', linestyle = line_type[g])
 	# ax4.text(result[:, 3].mean(), 0, str(np.round(result[:, 3].mean(), 3)))
+	ax4.set_xlim([0.2, 0.65])
 	ax4.set_xlabel('proportion')
 	ax4.set_ylabel('density')
-	ax4.set_title('proportion individuals who have no partners\nover evaluation window')
+	ax4.set_title('Proportion individuals who have\nno partners at each time step')
 
 	density, bins = np.histogram(result[:, 4], normed = True, density = True, bins = 20)
 	unity_density = density / density.sum()
@@ -299,29 +307,32 @@ for g in range(len(graph)):
 	ax5.bar(bins[1:], unity_density, width = widths, color = bar_col[g], alpha = 0.6)
 	lty[g] = ax5.axvline(result[:, 4].mean(), color = 'k', linestyle = line_type[g])
 	# ax3.text(result[:, 4].mean(), 0, str(np.round(result[:, 4].mean(), 3)))
+	ax5.set_xlim([-0.13, -0.06])
 	ax5.set_xlabel('correlation')
 	ax5.set_ylabel('density')
-	ax5.set_title('Correlation between degree and duration')
+	ax5.set_title('Correlation between duration and\nsum of degrees of a pair of individuals')
 
-	density, bins = np.histogram(result[:, 5]/2, normed = True, density = True, bins = 20)
+	density, bins = np.histogram(result[:, 5], normed = True, density = True, bins = 20)
 	unity_density = density / density.sum()
 	widths = bins[:-1] - bins[1:]
 	ax6.bar(bins[1:], unity_density, width = widths, color = bar_col[g], alpha = 0.6)
-	lty[g] = ax6.axvline((result[:, 5].mean()) / 2, color = 'k', linestyle = line_type[g])
+	lty[g] = ax6.axvline((result[:, 5].mean()), color = 'k', linestyle = line_type[g])
 	# ax3.text(result[:, 5].mean(), 0, str(np.round(result[:, 5].mean(), 3)))
+	ax6.set_xlim([3.75, 4.75])
 	ax6.set_xlabel('months')
 	ax6.set_ylabel('density')
-	ax6.set_title('average duration')
+	ax6.set_title('Average duration')
 
 
 # fig.subplots_adjust(bottom = 0.3) 
 handles = [Rectangle((0, 0), 1, 1, color = c, ec = c) for c in bar_col] + lty
-labels = [graph[i] for i in range(len(graph))] + [graph[i] + '\n(mean)'  for i in range(len(graph))]
+labels = ["scale-free", "empirical", "random", "community"] + \
+["scale-free\n(mean)", "empirical\n(mean)", "random\n(mean)", "community\n(mean)"]
 plt.legend(handles, labels, ncol = 1, bbox_to_anchor = (1.35, 0), loc='lower right', 
 	borderaxespad = 0, frameon = False, fontsize = 'medium')
 
 plt.tight_layout()
-plt.savefig('results/netout/netout_' + cor_or_not + '.png', format='png', dpi=500)
+plt.savefig('results/netout/netout_' + cor_or_not + '1000sim.png', format='png', dpi=500)
 plt.clf()
 
 

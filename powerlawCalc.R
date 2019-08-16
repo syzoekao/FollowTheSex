@@ -16,7 +16,7 @@ out = do.call(rbind, lapply(alpha_seq, estAlpha, x = x, m = 4*5))
 out = data.frame(out)
 min_alpha = out$alpha[out$difference == min(out$difference)]
 
-PowerLawDistribution = dpldis(x, 1, 1.32)
+PowerLawDistribution = dpldis(x, 1, 1.31)
 PowerLawDist = (PowerLawDistribution)/sum(PowerLawDistribution)
 
 fileConn<-file("PowerLawDist(200degree).txt")

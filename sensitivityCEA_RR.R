@@ -9,12 +9,11 @@ library(mgcv)
 library(dplyr)
 
 predData = function(g, cor_or_not, lvl, add_str) {
-  mydata = data.table(read.csv(paste0("results/RRresults/", g, cor_or_not, lvl, add_str,".csv")), 
+  mydata = data.table(read.csv(paste0("results/RRresults3/", g, cor_or_not, lvl, add_str,".csv")), 
                       key = c("strategy"))
   mydata[, 'pr'] = mydata[, 'p_treat_pn'] + mydata[, 'p_treat_ept'] + mydata[, 'p_treat_tr']
   colsel = c("strategy", "tot_person_time", "TotalCost", "pr")
   out = mydata[, ..colsel]
-  out[,"tot_person_time"] = out[,"tot_person_time"]/12
   out[, "TotalCost"] <- out[, "TotalCost"] / 1000
   colnames(out) = c("strategy", "Util", "TotalCost", "pr")
   out = out[strategy != "screen", ]
@@ -115,16 +114,12 @@ predData = function(g, cor_or_not, lvl, add_str) {
 }
 
 
-cor_or_not = "Uncorr"
-lvl = "Low"
-add_str = "(corr_scr 5yrs)"
 
-
-for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)", "(corr_scr 2yrs)", "(uncorr_scr 2yrs)")) {
-  for (cor_or_not in c("Uncorr", "Corr")) {
+for (add_str in c("(corr_scr 2yrs)")) {#, , "(uncorr_scr 2yrs)", "(corr_scr 2yrs)", "(uncorr_scr 2yrs)")) {
+  for (cor_or_not in c("Corr")) { # "Uncorr", 
     for (lvl in c("Low", "High")) {
       setEPS()
-      postscript(paste0('/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI/results/RRsummary/CE comparison ', 
+      postscript(paste0('/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI/results/RRsummary3/CE comparison ', 
                         cor_or_not, lvl, add_str, '.eps'), height = 12, width = 10)
       # par(mar=c(6, 8, 5, 3), oma = c(0, 0, 0, 0)) 
       layout(matrix(c(1,2,3,4,5,6,7,8), byrow = T, ncol=2),heights=c(5, 5, 5, 5))
@@ -137,7 +132,7 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)", "(corr_scr 2yrs)", "(u
       dev.off()
       
       gam_out <- rbind(randomDF, communityDF, power_lawDF, empiricalDF)
-      write.csv(gam_out, paste0("results/RRresults/", cor_or_not, lvl, add_str, "_estimate.csv"), row.names = F)
+      write.csv(gam_out, paste0("results/RRresults3/", cor_or_not, lvl, add_str, "_estimate.csv"), row.names = F)
     }
   }
 }
@@ -241,17 +236,17 @@ get_CEA_matrix <- function(g, df, wtp) {
 
 
 
-for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
-  for (cor_or_not in c("Uncorr", "Corr")) {
+for (add_str in c("(corr_scr 2yrs)")) { # , "(uncorr_scr 2yrs)"
+  for (cor_or_not in c("Corr")) { # "Uncorr", 
     for (lvl in c("Low", "High")) {
       mydata = lapply(c("random", "community", "power_law", "empirical"), 
                     function(g){
-                      nullData = read.csv(paste0("results/RRresults/", 
+                      nullData = read.csv(paste0("results/RRresults3/", 
                                                  g, cor_or_not, 
                                                  lvl, add_str, ".csv"))
                       nullData = subset(nullData, strategy == "screen", 
                                         select = c("strategy", "TotalCost", "tot_person_time"))
-                      nullData$tot_person_time = nullData$tot_person_time / 12 
+                      nullData$tot_person_time = nullData$tot_person_time
                       colnames(nullData) = c("strategy", "pred_C", "pred_U")
                       nullData = aggregate(cbind(pred_C, pred_U) ~ strategy, nullData, mean)
                       nullData$strategy = "screen"
@@ -261,10 +256,10 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
                     })
     
       mydata <- do.call(rbind, mydata)
-      tempDF = read.csv(paste0("results/RRresults/", cor_or_not, lvl, add_str, "_estimate.csv"))
+      tempDF = read.csv(paste0("results/RRresults3/", cor_or_not, lvl, add_str, "_estimate.csv"))
       tempDF <- rbind(tempDF, mydata)
       
-      wtp = 100000
+      wtp = 200
       
       mat_ls <- lapply(c("random", "community", "power_law", "empirical"), 
                        get_CEA_matrix, df = tempDF, wtp = wtp)
@@ -275,7 +270,7 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
                           labels = c("screening alone", "PN", "EPT", "Tracing"), 
                           drop = F) + 
         geom_point(x = 0.79, y = 0.71, pch = "*", cex = 12, colour = "firebrick", show.legend = FALSE) + 
-        ggtitle("Random network") + 
+        ggtitle("(A) Random network") + 
         xlab("EPT partner compliance") +
         ylab("PN partner compliance") + 
         theme_bw() + 
@@ -289,7 +284,7 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
                           labels = c("screening alone", "PN", "EPT", "Tracing"), 
                           drop = F) + 
         geom_point(x = 0.79, y = 0.71, pch = "*", cex = 12, colour = "firebrick", show.legend = FALSE) + 
-        ggtitle("Community network") + 
+        ggtitle("(B) Community network") + 
         xlab("EPT partner compliance") +
         ylab("PN partner compliance") + 
         theme_bw() + 
@@ -302,7 +297,7 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
         scale_fill_manual(values=c("gray80", "yellowgreen", "cornflowerblue", "gold"), 
                           labels = c("screening alone", "PN", "EPT", "Tracing"), 
                           drop = F) + 
-        ggtitle("Scale-free network") + 
+        ggtitle("(C) Scale-free network") + 
         geom_point(x = 0.79, y = 0.71, pch = "*", cex = 12, colour = "firebrick", show.legend = FALSE) + 
         xlab("EPT partner compliance") +
         ylab("PN partner compliance") + 
@@ -316,7 +311,7 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
         scale_fill_manual(values=c("gray80", "yellowgreen", "cornflowerblue", "gold"), 
                           labels = c("screening alone", "PN", "EPT", "Tracing"), 
                           drop = F) + 
-        ggtitle("Empirical network") + 
+        ggtitle("(D) Empirical network") + 
         geom_point(x = 0.79, y = 0.71, pch = "*", cex = 12, colour = "firebrick", show.legend = FALSE) + 
         xlab("EPT partner compliance") +
         ylab("PN partner compliance") + 
@@ -326,7 +321,7 @@ for (add_str in c("(corr_scr 5yrs)", "(uncorr_scr 5yrs)")) {
               plot.title = element_text(hjust = 0.5)) 
       
       all_p <- ggarrange(p1, p2, p3, p4, ncol=2, nrow=2, common.legend = TRUE, legend="bottom")
-      ggsave(paste0("results/RRsummary/", cor_or_not, lvl, add_str, "_CEmatrix.png"), 
+      ggsave(paste0("results/RRsummary3/", cor_or_not, lvl, add_str, "_CEmatrix", wtp, ".png"), 
              plot = all_p)
     }
   }

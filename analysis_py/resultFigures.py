@@ -20,8 +20,8 @@ cwd = os.getcwd()
 print(cwd)
 
 graph = ['random', 'community', 'power_law', 'empirical']
-indep = True
-pEFoI = (1 / 5000) / 2 * 10
+indep = False
+pEFoI = (1 / 5000) / 2
 n_samp = 500
 
 if indep == True: 
@@ -35,7 +35,7 @@ else:
     lvl = "High"
 
 for g in graph: 
-    with open('results/RRresults/trend/' + g + '_' + cor_or_not + lvl + '.txt') as json_file:  
+    with open('results/RRresults/trend/' + g + cor_or_not + lvl + '.txt') as json_file:  
         temp = json.load(json_file)
 
     policy_ls = [k for k, v in temp[0].items()][1:]
@@ -90,7 +90,7 @@ for g in graph:
     plt.plot(x_data, lb, color = 'salmon', linewidth = 0, alpha = 0.7)
     plt.plot(x_data, m, color = 'salmon', linewidth = 2)
     plt.fill_between(x_data, lb, ub, color = 'salmon', alpha = 0.7)
-    plt.ylim([0, 0.4])
+    plt.ylim([0, 0.25])
 
     plt.title(g)
     color_ls = ["gray", "royalblue", "limegreen", "salmon"]

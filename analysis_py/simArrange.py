@@ -22,7 +22,7 @@ def get_sim_result(graph, lvl, cor_or_not, texts = ''):
 
 	for file_n in range(1, 11): 
 		try: 
-			with open('results/RRresults/'+ graph + cor_or_not + lvl + '_' + str(file_n)+'.txt') as json_file:  
+			with open('results/RRresults3/'+ graph + cor_or_not + lvl + '_' + str(file_n)+'.txt') as json_file:  
 				temp_ls += json.load(json_file)
 		except: 
 			print(graph + cor_or_not + lvl + '_' + str(file_n))
@@ -96,16 +96,17 @@ def get_sim_result(graph, lvl, cor_or_not, texts = ''):
 	return out_file, file_name
 
 
-txt = '(corr_scr 5yrs)'
+txt = '(corr_scr 2yrs)'
 
 graph_key = ['random', 'community', 'power_law', 'empirical']
 
 
-for cor_or_not in ['Uncorr', 'Corr']:
+for cor_or_not in ['Corr']: # "Uncorr"
 	for lvl in ['Low', 'High']: 
 		for graph in graph_key: 
 			tmp_df, file_name = get_sim_result(graph, lvl, cor_or_not, texts = txt)
-			tmp_df.to_csv('results/RRresults/' + file_name + '.csv', index = False)
+			# tmp_df = tmp_df.iloc[np.random.choice(np.arange(34000), 17000).tolist()]
+			tmp_df.to_csv('results/RRresults3/' + file_name + '.csv', index = False)
 
 
 
@@ -125,16 +126,19 @@ os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
 cwd = os.getcwd()
 print(cwd)
 
-txt = '(uncorr_scr 5yrs)'
+txt = '(corr_scr 2yrs)'
 graph_key = ['random', 'community', 'power_law', 'empirical']
 
-for cor_or_not in ['Uncorr', 'Corr']:
+for cor_or_not in ['Corr']: # "Uncorr"
 	for lvl in ['Low', 'High']: 
 		output_list = [None] * len(graph_key)
 		for g in range(len(graph_key)): 
-			mydf = pd.read_csv('results/RRresults/' + graph_key[g] + cor_or_not + lvl + txt + '.csv')
+			mydf = pd.read_csv('results/RRresults3/' + graph_key[g] + cor_or_not + lvl + txt + '.csv')
 			mydf['pr'] = mydf['p_treat_pn'] + mydf['p_treat_ept'] + mydf['p_treat_tr']
+			mydf['p_infPart6mon'] = mydf['n_infPart6mon'] / mydf['n_part6mon']
 			mydf['averageTimesInfected_norm'] = mydf['pEverInfected'] * mydf['averageTimesInfected']
+			mydf['testYield'] = mydf['nTest'] - mydf['nScreen']
+			mydf['EPTYield'] = mydf['nTrueTreatIntervention'] + mydf['nOvertreat']
 			sum_out = mydf.groupby(['strategy', 'pr']).agg([np.mean, np.std])
 			sum_out = sum_out.stack()
 			# sum_out[['I', 'newI', 'tot_person_time', 'TotalCost']].to_csv('results/RRsummary/' + 'sum_' + graph + cor_or_not + lvl + txt + '.csv')
@@ -144,15 +148,54 @@ for cor_or_not in ['Uncorr', 'Corr']:
 			sum_out['graph'] = graph_key[g]
 			sum_out = sum_out[['graph', 'tot_person_time', 'TotalCost', 'I', 'newI', \
 			'averageTimesInfected_norm', 'corr_timesInf_and_degree', \
-			'n_part6mon', 'nDeliver', 'nContactTrace', 'nNotified', \
-			'CostMedicine', 'CostTracing', 'CostTest', 'nExtSeed', 'nTest', 'nScreen', \
-			'nTrueTreat', 'nOvertreat', 'nTrueTreatIntervention', 'pEfficient', 'pEverInfected', \
-			'nIntervention', 'pEverBeenIntervention', 'avgTimesBeenIntervene', 
+			'n_part6mon', 'n_infPart6mon', 'p_infPart6mon', 'nIntervention', 'testYield', \
+			'EPTYield', 'out_nPartnerTestedBefore', 'nTrueTreatIntervention', \
+			'nDeliver', 'nContactTrace', 'nNotified', 'CostMedicine', 'CostTracing', 'CostTest', \
+			'nExtSeed', 'nTest', 'nScreen', 'nTrueTreat', 'nOvertreat', 'nTrueTreatIntervention', \
+			'pEfficient', 'pEverInfected', 'pEverBeenIntervention', 'avgTimesBeenIntervene', \
 			'corr_PT_and_degree']]
 		
 			output_list[g] = sum_out
 	
 		output_list = pd.concat(output_list)
-		output_list.to_csv('results/RRsummary/sum_' + cor_or_not + lvl + txt + '.csv')
+		output_list.to_csv('results/RRsummary3/sum_' + cor_or_not + lvl + txt + '.csv')
+
+
+
+'''
+managing network summary statistics from network simulation
+'''
+
+import numpy as np
+import netSTI.netSTI as netSTI
+import pandas as pd
+import json
+import matplotlib as mpl
+from sklearn.linear_model import LinearRegression
+import copy
+
+import os
+os.chdir("/Users/szu-yukao/Documents/Network_structure_and_STI/networkSTI")
+cwd = os.getcwd()
+print(cwd)
+
+graph_ls = ['random', 'community', 'power_law', 'empirical']
+
+
+for graph in graph_ls: 
+	temp_ls = []
+	for file_n in range(1, 11): 
+		with open('results/netout/netout_'+ graph + '_Corr' + '_' + str(file_n)+'.txt') as json_file:  
+			temp_ls += json.load(json_file)
+
+	with open('results/netout/netout_'+ graph + 'Corr' + '1000sim.txt', 'w') as json_file:  
+		json.dump(temp_ls, json_file)
+
+
+
+
+
+
+
 
 
