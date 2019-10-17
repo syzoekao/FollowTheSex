@@ -29,7 +29,7 @@ def seed_rng(**_):
 @app.task
 def sim_task(run, indep, graph, pEFoI): 
     return netSTI.SIR_net_generator(run, 5000, years = 5, days = 14, 
-    graph = graph, pEFoI = pEFoI, independent = indep, corr_scr = True, base_case = False, 
+    graph = graph, pEFoI = pEFoI, independent = indep, PrEPuser = True, base_case = False, 
     trend = False, analysis_window = 2, output_netsum = False, output_net = False)
 
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     graph = "power_law"
     indep = False
-    pEFoI = (1 / 5000) / 2 * 10
+    pEFoI = (1 / 5000) / 2
     n_samp = 500
 
     if indep == True: 

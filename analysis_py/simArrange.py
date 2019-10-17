@@ -20,9 +20,9 @@ def get_sim_result(graph, lvl, cor_or_not, texts = ''):
 	'''
 	temp_ls = []
 
-	for file_n in range(1, 11): 
+	for file_n in range(1, 51): 
 		try: 
-			with open('results/RRresults3/'+ graph + cor_or_not + lvl + '_' + str(file_n)+'.txt') as json_file:  
+			with open('results/RR2results/'+ graph + cor_or_not + lvl + '_' + str(file_n)+'.txt') as json_file:  
 				temp_ls += json.load(json_file)
 		except: 
 			print(graph + cor_or_not + lvl + '_' + str(file_n))
@@ -106,7 +106,7 @@ for cor_or_not in ['Corr']: # "Uncorr"
 		for graph in graph_key: 
 			tmp_df, file_name = get_sim_result(graph, lvl, cor_or_not, texts = txt)
 			# tmp_df = tmp_df.iloc[np.random.choice(np.arange(34000), 17000).tolist()]
-			tmp_df.to_csv('results/RRresults3/' + file_name + '.csv', index = False)
+			tmp_df.to_csv('results/RR2results/' + file_name + '.csv', index = False)
 
 
 
@@ -118,7 +118,13 @@ summarizing results at base case
 import numpy as np
 import pandas as pd
 import json
+import seaborn as sns
 import matplotlib as mpl
+import matplotlib.gridspec as gridspec
+print(mpl.rcParams['backend'])
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
+plt.get_backend()
 import copy
 
 import os
@@ -133,12 +139,14 @@ for cor_or_not in ['Corr']: # "Uncorr"
 	for lvl in ['Low', 'High']: 
 		output_list = [None] * len(graph_key)
 		for g in range(len(graph_key)): 
-			mydf = pd.read_csv('results/RRresults3/' + graph_key[g] + cor_or_not + lvl + txt + '.csv')
+			mydf = pd.read_csv('results/RR2results/' + graph_key[g] + cor_or_not + lvl + txt + '.csv')
 			mydf['pr'] = mydf['p_treat_pn'] + mydf['p_treat_ept'] + mydf['p_treat_tr']
 			mydf['p_infPart6mon'] = mydf['n_infPart6mon'] / mydf['n_part6mon']
 			mydf['averageTimesInfected_norm'] = mydf['pEverInfected'] * mydf['averageTimesInfected']
 			mydf['testYield'] = mydf['nTest'] - mydf['nScreen']
 			mydf['EPTYield'] = mydf['nTrueTreatIntervention'] + mydf['nOvertreat']
+			mydf['pPartReachedTested'] = mydf['out_nPartnerTestedBefore'] / mydf['nIntervention']
+			mydf['avgDur'] = mydf['tot_person_time'] / mydf['newI']
 			sum_out = mydf.groupby(['strategy', 'pr']).agg([np.mean, np.std])
 			sum_out = sum_out.stack()
 			# sum_out[['I', 'newI', 'tot_person_time', 'TotalCost']].to_csv('results/RRsummary/' + 'sum_' + graph + cor_or_not + lvl + txt + '.csv')
@@ -153,12 +161,45 @@ for cor_or_not in ['Corr']: # "Uncorr"
 			'nDeliver', 'nContactTrace', 'nNotified', 'CostMedicine', 'CostTracing', 'CostTest', \
 			'nExtSeed', 'nTest', 'nScreen', 'nTrueTreat', 'nOvertreat', 'nTrueTreatIntervention', \
 			'pEfficient', 'pEverInfected', 'pEverBeenIntervention', 'avgTimesBeenIntervene', \
-			'corr_PT_and_degree']]
+			'corr_PT_and_degree', 'pPartReachedTested', 'avgDur']]
 		
 			output_list[g] = sum_out
 	
 		output_list = pd.concat(output_list)
-		output_list.to_csv('results/RRsummary3/sum_' + cor_or_not + lvl + txt + '.csv')
+		output_list.to_csv('results/RR2summary/sum_' + cor_or_not + lvl + txt + '.csv')
+
+
+randomDF = pd.read_csv('results/RR2results/randomCorrHigh(corr_scr 2yrs).csv')
+randomDF = randomDF.loc[randomDF["strategy"] == "screen"]
+communityDF = pd.read_csv('results/RR2results/communityCorrHigh(corr_scr 2yrs).csv')
+communityDF = communityDF.loc[communityDF["strategy"] == "screen"]
+power_lawDF = pd.read_csv('results/RR2results/power_lawCorrHigh(corr_scr 2yrs).csv')
+power_lawDF = power_lawDF.loc[power_lawDF["strategy"] == "screen"]
+empiricalDF = pd.read_csv('results/RR2results/empiricalCorrHigh(corr_scr 2yrs).csv')
+empiricalDF = empiricalDF.loc[empiricalDF["strategy"] == "screen"]
+
+
+fig = plt.figure(figsize = (12, 8))
+G = gridspec.GridSpec(2, 2)
+ax1 = plt.subplot(G[0, 0])
+ax1.set_title('Random',fontsize=16)
+ax1.hist(randomDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+
+ax2 = plt.subplot(G[0, 1])
+ax2.set_title('Community-structured',fontsize=16)
+ax2.hist(communityDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+
+ax3 = plt.subplot(G[1, 0])
+ax3.set_title('Scale-free',fontsize=16)
+ax3.hist(power_lawDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+
+ax4 = plt.subplot(G[1, 1])
+ax4.set_title('Empirical',fontsize=16)
+ax4.hist(empiricalDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+
+G.tight_layout(fig, rect=[0, 0, 1, 0.97])
+plt.savefig('results/RR2summary/prevalence distribution (high).png', format='png', dpi=600)
+plt.clf()
 
 
 
