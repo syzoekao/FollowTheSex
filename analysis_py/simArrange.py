@@ -114,7 +114,6 @@ for cor_or_not in ['Corr']: # "Uncorr"
 summarizing results at base case
 '''
 
-
 import numpy as np
 import pandas as pd
 import json
@@ -169,36 +168,46 @@ for cor_or_not in ['Corr']: # "Uncorr"
 		output_list.to_csv('results/RR2summary/sum_' + cor_or_not + lvl + txt + '.csv')
 
 
-randomDF = pd.read_csv('results/RR2results/randomCorrHigh(corr_scr 2yrs).csv')
+randomDF = pd.read_csv('results/RR2results/randomCorrLow(corr_scr 2yrs).csv')
 randomDF = randomDF.loc[randomDF["strategy"] == "screen"]
-communityDF = pd.read_csv('results/RR2results/communityCorrHigh(corr_scr 2yrs).csv')
+communityDF = pd.read_csv('results/RR2results/communityCorrLow(corr_scr 2yrs).csv')
 communityDF = communityDF.loc[communityDF["strategy"] == "screen"]
-power_lawDF = pd.read_csv('results/RR2results/power_lawCorrHigh(corr_scr 2yrs).csv')
+power_lawDF = pd.read_csv('results/RR2results/power_lawCorrLow(corr_scr 2yrs).csv')
 power_lawDF = power_lawDF.loc[power_lawDF["strategy"] == "screen"]
-empiricalDF = pd.read_csv('results/RR2results/empiricalCorrHigh(corr_scr 2yrs).csv')
+empiricalDF = pd.read_csv('results/RR2results/empiricalCorrLow(corr_scr 2yrs).csv')
 empiricalDF = empiricalDF.loc[empiricalDF["strategy"] == "screen"]
 
 
+plt.close()
 fig = plt.figure(figsize = (12, 8))
+fig.suptitle("(B) Distribution of prevalence (low EFOI)", y=0.995, fontsize=20)
 G = gridspec.GridSpec(2, 2)
 ax1 = plt.subplot(G[0, 0])
 ax1.set_title('Random',fontsize=16)
-ax1.hist(randomDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+ax1.set_xlabel('Prevalence', fontsize = 12)
+ax1.set_ylabel('Frequency', fontsize = 12)
+ax1.hist(randomDF[["I"]].to_numpy().T[0], bins=25, color = sns.xkcd_rgb['dodger blue'])
 
 ax2 = plt.subplot(G[0, 1])
 ax2.set_title('Community-structured',fontsize=16)
-ax2.hist(communityDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+ax2.set_xlabel('Prevalence', fontsize = 12)
+ax2.set_ylabel('Frequency', fontsize = 12)
+ax2.hist(communityDF[["I"]].to_numpy().T[0], bins=25, color = sns.xkcd_rgb['dodger blue'])
 
 ax3 = plt.subplot(G[1, 0])
 ax3.set_title('Scale-free',fontsize=16)
-ax3.hist(power_lawDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+ax3.set_xlabel('Prevalence', fontsize = 12)
+ax3.set_ylabel('Frequency', fontsize = 12)
+ax3.hist(power_lawDF[["I"]].to_numpy().T[0], bins=25, color = sns.xkcd_rgb['dodger blue'])
 
 ax4 = plt.subplot(G[1, 1])
 ax4.set_title('Empirical',fontsize=16)
-ax4.hist(empiricalDF[["I"]].to_numpy().T[0], normed=True, bins=20, color = sns.xkcd_rgb['dodger blue'])
+ax4.set_xlabel('Prevalence', fontsize = 12)
+ax4.set_ylabel('Frequency', fontsize = 12)
+ax4.hist(empiricalDF[["I"]].to_numpy().T[0], bins=25, color = sns.xkcd_rgb['dodger blue'])
 
 G.tight_layout(fig, rect=[0, 0, 1, 0.97])
-plt.savefig('results/RR2summary/prevalence distribution (high).png', format='png', dpi=600)
+plt.savefig('results/RR2summary/prevalence distribution (low).png', format='png', dpi=600)
 plt.clf()
 
 
